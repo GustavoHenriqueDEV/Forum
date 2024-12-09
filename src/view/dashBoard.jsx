@@ -18,18 +18,28 @@ import TextField from "@mui/material/TextField";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import CommentIcon from "@mui/icons-material/Comment";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import { Try } from "@mui/icons-material";
-import { getPosts, createPosts } from "../service/service"; // Ajuste o caminho conforme necessário
+import { getPosts, createPosts, adicionarComentario } from "../service/service"; // Ajuste o
 
 export default function Dashboard() {
   const [posts, setPosts] = useState([]);
+  const [openComments, setOpenComments] = useState({});
   const [newPost, setNewPost] = useState({
     titulo: "",
     tipo: "",
+    usuario: {
+      idusuario: "",
+    },
     conteudo: "",
     likes: 0,
     comentario: "",
   });
+
+  const toggleComments = (id) => {
+    setOpenComments((prevState) => ({
+      ...prevState,
+      [id]: !prevState[id], // Alterna entre aberto e fechado
+    }));
+  };
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -44,18 +54,34 @@ export default function Dashboard() {
   }, []);
 
   const handleCreatePost = async () => {
+    const idusuarioLocal = localStorage.getItem("idusuario"); // Recupera o ID do usuário
+    if (!idusuarioLocal) {
+      alert("Usuário não autenticado!");
+      return;
+    }
+
     try {
-      const createdPost = await createPosts(newPost);
-      setPosts([...posts, createdPost]); // Atualiza a lista de posts
+      const createdPost = await createPosts({
+        ...newPost,
+        usuario: { idusuario: parseInt(idusuarioLocal) }, // Garante que o ID seja um número
+      });
+
+      // Atualiza a lista de posts com o novo post
+      setPosts((prevPosts) => [...prevPosts, createdPost]);
+      // Limpa o formulário
       setNewPost({
         titulo: "",
         tipo: "",
         conteudo: "",
+        usuario: { idusuario: "" },
         likes: 0,
         comentario: "",
-      }); // Limpa o formulário
+      });
+
+      setOpen(false); // Fecha o modal
     } catch (error) {
       console.error("Erro ao criar post:", error);
+      alert("Ocorreu um erro ao criar o post.");
     }
   };
 
@@ -64,9 +90,30 @@ export default function Dashboard() {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const handleSubmit = () => {
-    console.log("Post enviado com sucesso");
-    setOpen(false);
+  const handleDoComent = async (idpost) => {
+    const comentario = newPost.comentario; // O texto do novo comentário
+    const idusuarioLocal = localStorage.getItem("idusuario");
+    if (!idusuarioLocal) {
+      alert("Usuário não autenticado!");
+      return;
+    }
+
+    if (!comentario) {
+      alert("Digite um comentário antes de publicar.");
+      return;
+    }
+
+    try {
+      const comentarioData = { texto: comentario }; // Se o comentário for um simples texto
+      // Você deve criar a função `adicionarComentario` para enviar esse dado
+      await adicionarComentario(idpost, comentarioData);
+      // Aqui você pode atualizar a lista de comentários do post ou fazer outra ação
+      alert("Comentário publicado com sucesso!");
+      setNewPost({ ...newPost, comentario: "" }); // Limpar o campo de comentário após enviar
+    } catch (error) {
+      console.error("Erro ao adicionar comentário:", error);
+      alert("Ocorreu um erro ao adicionar o comentário.");
+    }
   };
 
   return (
@@ -102,13 +149,8 @@ export default function Dashboard() {
 
         {/* Coluna Central */}
         <Grid item xs={6}>
-          {/* Input e botão */}
           <h1>Lista de Posts</h1>
-          <ul>
-            {posts.map((post) => (
-              <li key={post.idpost}>{post.titulo}</li>
-            ))}
-          </ul>
+
           <Box sx={{ display: "flex", alignItems: "center", marginBottom: 2 }}>
             <Box
               sx={{
@@ -152,26 +194,30 @@ export default function Dashboard() {
                   label="Post Title"
                   type="text"
                   InputLabelProps={{
-                    style: { color: "white" }, // Cor do label (título do campo)
+                    style: { color: "white" },
                   }}
                   InputProps={{
-                    style: { color: "white", borderColor: "white" }, // Cor do texto digitado
+                    style: { color: "white", borderColor: "white" },
                   }}
                   sx={{
                     "& .MuiOutlinedInput-root": {
                       "& fieldset": {
-                        borderColor: "white", // Borda branca
+                        borderColor: "white",
                       },
                       "&:hover fieldset": {
-                        borderColor: "#ff8c00", // Borda laranja ao passar o mouse
+                        borderColor: "#ff8c00",
                       },
                       "&.Mui-focused fieldset": {
-                        borderColor: "#ff8c00", // Borda laranja ao focar
+                        borderColor: "#ff8c00",
                       },
                     },
                   }}
                   fullWidth
                   variant="outlined"
+                  value={newPost.titulo}
+                  onChange={(e) =>
+                    setNewPost({ ...newPost, titulo: e.target.value })
+                  }
                 />
                 <TextField
                   margin="dense"
@@ -181,24 +227,28 @@ export default function Dashboard() {
                   multiline
                   rows={4}
                   InputLabelProps={{
-                    style: { color: "white" }, // Cor do label (título do campo)
+                    style: { color: "white" },
                   }}
                   InputProps={{
-                    style: { color: "white", borderColor: "white" }, // Cor do texto digitado
+                    style: { color: "white", borderColor: "white" },
                   }}
                   sx={{
                     "& .MuiOutlinedInput-root": {
                       "& fieldset": {
-                        borderColor: "white", // Borda branca
+                        borderColor: "white",
                       },
                       "&:hover fieldset": {
-                        borderColor: "#ff8c00", // Borda laranja ao passar o mouse
+                        borderColor: "#ff8c00",
                       },
                       "&.Mui-focused fieldset": {
-                        borderColor: "#ff8c00", // Borda laranja ao focar
+                        borderColor: "#ff8c00",
                       },
                     },
                   }}
+                  value={newPost.conteudo}
+                  onChange={(e) =>
+                    setNewPost({ ...newPost, conteudo: e.target.value })
+                  }
                   variant="outlined"
                 />
               </DialogContent>
@@ -206,7 +256,7 @@ export default function Dashboard() {
                 <Button onClick={handleClose} color="secondary">
                   Cancel
                 </Button>
-                <Button onClick={handleSubmit} color="primary">
+                <Button onClick={handleCreatePost} color="primary">
                   Post
                 </Button>
               </DialogActions>
@@ -214,23 +264,27 @@ export default function Dashboard() {
           </Box>
 
           {/* Posts */}
-          {[1, 2, 3].map((post) => (
-            <Card sx={{ backgroundColor: "#2C2C3A", marginBottom: 2 }}>
+
+          {posts.map((post) => (
+            <Card
+              key={post.idpost}
+              sx={{ backgroundColor: "#2C2C3A", marginBottom: 2 }}
+            >
               <CardContent>
                 <Typography sx={{ color: "#FFF", fontWeight: "bold" }}>
-                  Post Title {post}
+                  {post.titulo}
                 </Typography>
                 <Box
                   sx={{ display: "flex", alignItems: "center", marginTop: 1 }}
                 >
                   <Avatar sx={{ marginRight: 1 }}>P</Avatar>
                   <Typography sx={{ color: "#AAA" }}>
-                    Username • 3 days ago
+                    {post.nome} • 3 days ago
                   </Typography>
                 </Box>
                 <Box sx={{ marginTop: 2 }}>
                   <Typography sx={{ color: "#FFF" }}>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit...
+                    {post.conteudo}
                   </Typography>
                 </Box>
                 <Box
@@ -243,11 +297,11 @@ export default function Dashboard() {
                 >
                   <Box sx={{ display: "flex", gap: 2 }}>
                     <IconButton>
-                      <Badge badgeContent={4} color="error">
+                      <Badge badgeContent={post.likes} color="error">
                         <FavoriteIcon sx={{ color: "#FF6F00" }} />
                       </Badge>
                     </IconButton>
-                    <IconButton>
+                    <IconButton onClick={() => toggleComments(post.idpost)}>
                       <CommentIcon sx={{ color: "#FFF" }} />
                     </IconButton>
                     <IconButton>
@@ -255,6 +309,67 @@ export default function Dashboard() {
                     </IconButton>
                   </Box>
                 </Box>
+
+                {/* Comentários - Renderização Condicional */}
+                {openComments[post.idpost] && (
+                  <Box
+                    sx={{
+                      marginTop: 2,
+                      backgroundColor: "#333",
+                      borderRadius: 2,
+                      padding: 2,
+                    }}
+                  >
+                    <Typography sx={{ color: "#FFF", marginBottom: 1 }}>
+                      Comments:
+                    </Typography>
+                    {Array.isArray(post.comentarios) &&
+                    post.comentarios.length > 0 ? (
+                      post.comentarios.map((comentario, index) => (
+                        <Typography
+                          key={index}
+                          sx={{
+                            color: "#AAA",
+                            backgroundColor: "#444",
+                            padding: 1,
+                            borderRadius: 1,
+                            marginBottom: 1,
+                          }}
+                        >
+                          {comentario.texto}{" "}
+                          {/* Supondo que o comentário tenha a chave 'texto' */}
+                        </Typography>
+                      ))
+                    ) : (
+                      <Typography sx={{ color: "#AAA" }}>
+                        No comments yet.
+                      </Typography>
+                    )}
+                    {/* Campo para adicionar novo comentário */}
+                    <TextField
+                      placeholder="Write a comment..."
+                      variant="outlined"
+                      fullWidth
+                      value={newPost.comentario}
+                      onChange={(e) =>
+                        setNewPost({ ...newPost, comentario: e.target.value })
+                      }
+                      sx={{
+                        marginTop: 1,
+                        backgroundColor: "#555",
+                        borderRadius: 1,
+                        input: { color: "#FFF" },
+                      }}
+                    />
+                    <Button
+                      onClick={() => handleDoComent(post.idpost)}
+                      variant="contained"
+                      sx={{ backgroundColor: "#FF6F00", marginLeft: 0 }}
+                    >
+                      Publicar
+                    </Button>
+                  </Box>
+                )}
               </CardContent>
             </Card>
           ))}
