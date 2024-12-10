@@ -18,10 +18,17 @@ import TextField from "@mui/material/TextField";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import CommentIcon from "@mui/icons-material/Comment";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import { getPosts, createPosts, adicionarComentario } from "../service/service"; // Ajuste o
+import {
+  getPosts,
+  createPosts,
+  getComentariosByPost,
+} from "../service/service"; // Ajuste o
+import { color } from "@mui/system";
 
 export default function Dashboard() {
   const [posts, setPosts] = useState([]);
+  const [coments, setComents] = useState([]);
+
   const [openComments, setOpenComments] = useState({});
   const [newPost, setNewPost] = useState({
     titulo: "",
@@ -31,14 +38,31 @@ export default function Dashboard() {
     },
     conteudo: "",
     likes: 0,
-    comentario: "",
   });
 
   const toggleComments = (id) => {
+    const isOpen = openComments[id] || false;
     setOpenComments((prevState) => ({
       ...prevState,
-      [id]: !prevState[id], // Alterna entre aberto e fechado
+      [id]: !isOpen,
     }));
+
+    // Apenas busca comentários se ainda não foi aberto
+    if (!isOpen && !coments[id]) {
+      fetchComent(id);
+    }
+  };
+
+  const fetchComent = async (idpost) => {
+    try {
+      const comentData = await getComentariosByPost(idpost);
+      setComents((prevState) => ({
+        ...prevState,
+        [idpost]: comentData,
+      })); // Armazena comentários por ID do post
+    } catch (error) {
+      console.error(`Erro ao buscar comentários para o post ${idpost}:`, error);
+    }
   };
 
   useEffect(() => {
@@ -66,7 +90,6 @@ export default function Dashboard() {
         usuario: { idusuario: parseInt(idusuarioLocal) }, // Garante que o ID seja um número
       });
 
-      // Atualiza a lista de posts com o novo post
       setPosts((prevPosts) => [...prevPosts, createdPost]);
       // Limpa o formulário
       setNewPost({
@@ -75,7 +98,6 @@ export default function Dashboard() {
         conteudo: "",
         usuario: { idusuario: "" },
         likes: 0,
-        comentario: "",
       });
 
       setOpen(false); // Fecha o modal
@@ -89,32 +111,6 @@ export default function Dashboard() {
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-
-  const handleDoComent = async (idpost) => {
-    const comentario = newPost.comentario; // O texto do novo comentário
-    const idusuarioLocal = localStorage.getItem("idusuario");
-    if (!idusuarioLocal) {
-      alert("Usuário não autenticado!");
-      return;
-    }
-
-    if (!comentario) {
-      alert("Digite um comentário antes de publicar.");
-      return;
-    }
-
-    try {
-      const comentarioData = { texto: comentario }; // Se o comentário for um simples texto
-      // Você deve criar a função `adicionarComentario` para enviar esse dado
-      await adicionarComentario(idpost, comentarioData);
-      // Aqui você pode atualizar a lista de comentários do post ou fazer outra ação
-      alert("Comentário publicado com sucesso!");
-      setNewPost({ ...newPost, comentario: "" }); // Limpar o campo de comentário após enviar
-    } catch (error) {
-      console.error("Erro ao adicionar comentário:", error);
-      alert("Ocorreu um erro ao adicionar o comentário.");
-    }
-  };
 
   return (
     <Box sx={{ backgroundColor: "#1E1E2F", minHeight: "100vh", padding: 2 }}>
@@ -149,7 +145,7 @@ export default function Dashboard() {
 
         {/* Coluna Central */}
         <Grid item xs={6}>
-          <h1>Lista de Posts</h1>
+          <h1 style={{ color: "white" }}>Lista de Posts</h1>
 
           <Box sx={{ display: "flex", alignItems: "center", marginBottom: 2 }}>
             <Box
@@ -323,37 +319,23 @@ export default function Dashboard() {
                     <Typography sx={{ color: "#FFF", marginBottom: 1 }}>
                       Comments:
                     </Typography>
-                    {Array.isArray(post.comentarios) &&
-                    post.comentarios.length > 0 ? (
-                      post.comentarios.map((comentario, index) => (
-                        <Typography
-                          key={index}
-                          sx={{
-                            color: "#AAA",
-                            backgroundColor: "#444",
-                            padding: 1,
-                            borderRadius: 1,
-                            marginBottom: 1,
-                          }}
-                        >
-                          {comentario.texto}{" "}
-                          {/* Supondo que o comentário tenha a chave 'texto' */}
-                        </Typography>
-                      ))
+                    {coments[post.idpost]?.length > 0 ? (
+                      <ul>
+                        {coments[post.idpost].map((comentario) => (
+                          <li key={comentario.idcomentario}>
+                            {comentario.conteudo}
+                          </li>
+                        ))}
+                      </ul>
                     ) : (
                       <Typography sx={{ color: "#AAA" }}>
-                        No comments yet.
+                        Nenhum comentário.
                       </Typography>
                     )}
-                    {/* Campo para adicionar novo comentário */}
                     <TextField
                       placeholder="Write a comment..."
                       variant="outlined"
                       fullWidth
-                      value={newPost.comentario}
-                      onChange={(e) =>
-                        setNewPost({ ...newPost, comentario: e.target.value })
-                      }
                       sx={{
                         marginTop: 1,
                         backgroundColor: "#555",
@@ -362,7 +344,6 @@ export default function Dashboard() {
                       }}
                     />
                     <Button
-                      onClick={() => handleDoComent(post.idpost)}
                       variant="contained"
                       sx={{ backgroundColor: "#FF6F00", marginLeft: 0 }}
                     >

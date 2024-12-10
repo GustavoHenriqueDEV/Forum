@@ -76,24 +76,15 @@ export const registerUser = async (userData) => {
     throw error; // Lança erro para tratamento no frontend
   }
 };
-// Função POST para adicionar um comentário a um post
-export const adicionarComentario = async (idpost, comentario) => {
+// Buscar comentários de um post específico
+export const getComentariosByPost = async (idpost) => {
   try {
-    const response = await axios.post(
-      `${API_URL}/posts/${idpost}/comentarios`,
-      comentario,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    return response.data; // Retorna o comentário criado ou a mensagem de sucesso
+    const response = await axios.get(`${API_URL}/posts/${idpost}/comentarios`);
+    return response.data;
   } catch (error) {
-    console.error(
-      `Erro ao adicionar comentário ao post com ID ${idPost}:`,
-      error
-    );
-    throw error; // Lança o erro para tratamento no componente
+    console.error(`Erro ao buscar comentários do post ${idpost}:`, error);
+    throw error;
   }
 };
+
+// Função POST para adicionar um comentário a um post
