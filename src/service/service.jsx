@@ -88,3 +88,20 @@ export const getComentariosByPost = async (idpost) => {
 };
 
 // Função POST para adicionar um comentário a um post
+export const createComentario = async (idpost, comentario) => {
+  try {
+    const response = await axios.post(
+      `${API_URL}/posts/${idpost}/comentarios`,
+      comentario,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    return response.data; // Retorna o comentário criado
+  } catch (error) {
+    console.error(`Erro ao criar comentário no post ${idpost}:`, error);
+    throw error;
+  }
+};

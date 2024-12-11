@@ -22,13 +22,14 @@ import {
   getPosts,
   createPosts,
   getComentariosByPost,
+  createComentario,
 } from "../service/service"; // Ajuste o
 import { color } from "@mui/system";
 
 export default function Dashboard() {
   const [posts, setPosts] = useState([]);
   const [coments, setComents] = useState([]);
-
+  const [newComment, setNewComment] = useState({});
   const [openComments, setOpenComments] = useState({});
   const [newPost, setNewPost] = useState({
     titulo: "",
@@ -104,6 +105,34 @@ export default function Dashboard() {
     } catch (error) {
       console.error("Erro ao criar post:", error);
       alert("Ocorreu um erro ao criar o post.");
+    }
+  };
+
+  const handleCreateComment = async (idpost) => {
+    const idusuarioLocal = localStorage.getItem("idusuario"); // ID do usuário autenticado
+    if (!idusuarioLocal) {
+      alert("Usuário não autenticado!");
+      return;
+    }
+
+    try {
+      const comentario = {
+        conteudo: newComment[idpost], // Conteúdo do comentário para o post específico
+        usuario: { idusuario: parseInt(idusuarioLocal) },
+      };
+
+      const createdComment = await createComentario(idpost, comentario);
+      setComents((prevState) => ({
+        ...prevState,
+        [idpost]: [...(prevState[idpost] || []), createdComment],
+      }));
+      setNewComment((prevState) => ({
+        ...prevState,
+        [idpost]: "", // Limpa o campo do comentário
+      }));
+    } catch (error) {
+      console.error(`Erro ao criar comentário no post ${idpost}:`, error);
+      alert("Erro ao publicar comentário.");
     }
   };
 
@@ -275,7 +304,8 @@ export default function Dashboard() {
                 >
                   <Avatar sx={{ marginRight: 1 }}>P</Avatar>
                   <Typography sx={{ color: "#AAA" }}>
-                    {post.nome} • 3 days ago
+                    {post.nome ? post.nome : "Usuário desconhecido"} • 3 days
+                    ago
                   </Typography>
                 </Box>
                 <Box sx={{ marginTop: 2 }}>
@@ -323,6 +353,8 @@ export default function Dashboard() {
                       <ul>
                         {coments[post.idpost].map((comentario) => (
                           <li key={comentario.idcomentario}>
+                            nomeComentador: {comentario.usuario.nome}
+                            <br />
                             {comentario.conteudo}
                           </li>
                         ))}
@@ -336,6 +368,13 @@ export default function Dashboard() {
                       placeholder="Write a comment..."
                       variant="outlined"
                       fullWidth
+                      value={newComment[post.idpost] || ""}
+                      onChange={(e) =>
+                        setNewComment((prevState) => ({
+                          ...prevState,
+                          [post.idpost]: e.target.value,
+                        }))
+                      }
                       sx={{
                         marginTop: 1,
                         backgroundColor: "#555",
@@ -344,8 +383,9 @@ export default function Dashboard() {
                       }}
                     />
                     <Button
+                      onClick={() => handleCreateComment(post.idpost)}
                       variant="contained"
-                      sx={{ backgroundColor: "#FF6F00", marginLeft: 0 }}
+                      sx={{ backgroundColor: "#FF6F00", marginTop: 1 }}
                     >
                       Publicar
                     </Button>
