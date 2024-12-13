@@ -105,3 +105,21 @@ export const createComentario = async (idpost, comentario) => {
     throw error;
   }
 };
+
+export const incrementLikes = async (idpost, idusuario) => {
+  try {
+    const response = await axios.post(
+      `${API_URL}/posts/${idpost}/likes?idusuario=${idusuario}`,
+      {},
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    return response.data; // Supondo que a API retorna o número de likes atualizado
+  } catch (error) {
+    console.error("Erro no serviço de likes:", error);
+    throw error;
+  }
+};

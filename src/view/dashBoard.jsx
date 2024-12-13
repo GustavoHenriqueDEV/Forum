@@ -23,12 +23,14 @@ import {
   createPosts,
   getComentariosByPost,
   createComentario,
+  incrementLikes,
 } from "../service/service"; // Ajuste o
 import { color } from "@mui/system";
 
 export default function Dashboard() {
   const [posts, setPosts] = useState([]);
   const [coments, setComents] = useState([]);
+  const [likes, setLikes] = useState(posts.likes);
   const [newComment, setNewComment] = useState({});
   const [openComments, setOpenComments] = useState({});
   const [newPost, setNewPost] = useState({
@@ -40,6 +42,29 @@ export default function Dashboard() {
     conteudo: "",
     likes: 0,
   });
+
+  const handleLike = async (idpost) => {
+    const idusuarioLocal = localStorage.getItem("idusuario"); // Obtém o ID do usuário autenticado
+    if (!idusuarioLocal) {
+      alert("Usuário não autenticado!");
+      return;
+    }
+
+    try {
+      const updatedLikes = await incrementLikes(
+        idpost,
+        parseInt(idusuarioLocal)
+      ); // Passa o ID do usuário
+      setPosts((prevPosts) =>
+        prevPosts.map((post) =>
+          post.idpost === idpost ? { ...post, likes: updatedLikes } : post
+        )
+      );
+    } catch (error) {
+      alert("Erro ao incrementar likes. Tente novamente mais tarde.");
+      console.error("Erro ao dar like:", error);
+    }
+  };
 
   const toggleComments = (id) => {
     const isOpen = openComments[id] || false;
@@ -100,16 +125,24 @@ export default function Dashboard() {
         usuario: { idusuario: "" },
         likes: 0,
       });
-
-      setOpen(false); // Fecha o modal
+      setOpen(false);
+      const fetchPosts = async () => {
+        try {
+          const postsData = await getPosts();
+          setPosts(postsData);
+        } catch (error) {
+          console.error("Erro ao buscar posts:", error);
+        }
+      };
+      fetchPosts();
+      // Fecha o modal
     } catch (error) {
       console.error("Erro ao criar post:", error);
       alert("Ocorreu um erro ao criar o post.");
     }
   };
-
   const handleCreateComment = async (idpost) => {
-    const idusuarioLocal = localStorage.getItem("idusuario"); // ID do usuário autenticado
+    const idusuarioLocal = localStorage.getItem("idusuario");
     if (!idusuarioLocal) {
       alert("Usuário não autenticado!");
       return;
@@ -117,7 +150,7 @@ export default function Dashboard() {
 
     try {
       const comentario = {
-        conteudo: newComment[idpost], // Conteúdo do comentário para o post específico
+        conteudo: newComment[idpost],
         usuario: { idusuario: parseInt(idusuarioLocal) },
       };
 
@@ -128,8 +161,21 @@ export default function Dashboard() {
       }));
       setNewComment((prevState) => ({
         ...prevState,
-        [idpost]: "", // Limpa o campo do comentário
+        [idpost]: "",
       }));
+
+      // Atualiza o post na lista
+      setPosts((prevPosts) =>
+        prevPosts.map((post) =>
+          post.idpost === idpost
+            ? {
+                ...post,
+                comentarios: [...(post.comentarios || []), createdComment],
+              }
+            : post
+        )
+      );
+      fetchComent(idpost);
     } catch (error) {
       console.error(`Erro ao criar comentário no post ${idpost}:`, error);
       alert("Erro ao publicar comentário.");
@@ -322,11 +368,13 @@ export default function Dashboard() {
                   }}
                 >
                   <Box sx={{ display: "flex", gap: 2 }}>
-                    <IconButton>
-                      <Badge badgeContent={post.likes} color="error">
-                        <FavoriteIcon sx={{ color: "#FF6F00" }} />
-                      </Badge>
-                    </IconButton>
+                    <Button onClick={() => handleLike(post.idpost)}>
+                      <IconButton>
+                        <Badge badgeContent={post.likes} color="error">
+                          <FavoriteIcon sx={{ color: "#FF6F00" }} />
+                        </Badge>
+                      </IconButton>
+                    </Button>
                     <IconButton onClick={() => toggleComments(post.idpost)}>
                       <CommentIcon sx={{ color: "#FFF" }} />
                     </IconButton>
@@ -353,7 +401,8 @@ export default function Dashboard() {
                       <ul>
                         {coments[post.idpost].map((comentario) => (
                           <li key={comentario.idcomentario}>
-                            nomeComentador: {comentario.usuario.nome}
+                            nomeComentador:{" "}
+                            {comentario.usuario?.nome || "Usuário desconhecido"}
                             <br />
                             {comentario.conteudo}
                           </li>
