@@ -33,6 +33,7 @@ export default function Dashboard() {
   const [likes, setLikes] = useState(posts.likes);
   const [newComment, setNewComment] = useState({});
   const [openComments, setOpenComments] = useState({});
+  const [userName, setUserName] = useState("");
   const [newPost, setNewPost] = useState({
     titulo: "",
     tipo: "",
@@ -181,6 +182,18 @@ export default function Dashboard() {
       alert("Erro ao publicar comentário.");
     }
   };
+
+  useEffect(() => {
+    const fetchName = async () => {
+      try {
+        const localName = localStorage.username;
+        setUserName(localName);
+      } catch (error) {
+        console.error("Erro ao buscar o nome", error);
+      }
+    };
+    fetchName;
+  });
 
   const [open, setOpen] = useState(false);
 

@@ -1,41 +1,43 @@
-import React from "react";
+import React, { useState } from "react";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
 import InputBase from "@mui/material/InputBase";
-import Avatar from "@mui/material/Avatar";
-import Badge from "@mui/material/Badge";
-import HomeIcon from "@mui/icons-material/Home";
-import GroupIcon from "@mui/icons-material/Group";
-import NotificationsIcon from "@mui/icons-material/Notifications";
-import ChatIcon from "@mui/icons-material/Chat";
 import SearchIcon from "@mui/icons-material/Search";
+import DialogTitle from "@mui/material/DialogTitle";
+import AuthPage from "./AuthPage"; // Importe o componente de login aqui
 
 export default function CustomAppBar() {
+  const [open, setOpen] = useState(false); // Controle para abrir/fechar o modal
+  const username = localStorage.getItem("username");
+
+  const handleLogout = () => {
+    localStorage.clear(); // Limpa o localStorage
+    window.location.reload(); // Recarrega a página
+  };
+
+  const handleLoginOpen = () => {
+    setOpen(true); // Abre o modal
+  };
+
+  const handleLoginClose = () => {
+    setOpen(false); // Fecha o modal
+  };
+
   return (
     <AppBar
       position="static"
       sx={{ backgroundColor: "#262D34", padding: "0 16px", height: 70 }}
     >
       <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
-        {/* Esquerda: Logo e Nome */}
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          <img
-            src="https://via.placeholder.com/40"
-            alt="Logo"
-            style={{ borderRadius: "50%", marginRight: 8 }}
-          />
-          <Typography
-            variant="h6"
-            sx={{ fontWeight: "bold", color: "#FF6F00" }}
-          >
-            UP THE FORUM!
-          </Typography>
-        </Box>
-
-        {/* Centro: Ícones e Campo de Busca */}
+        <Typography variant="h6" sx={{ fontWeight: "bold", color: "#FF6F00" }}>
+          UP THE FORUM!
+        </Typography>
         <Box
           sx={{
             display: "flex",
@@ -45,17 +47,7 @@ export default function CustomAppBar() {
             gap: 2,
           }}
         >
-          <IconButton sx={{ color: "#FFF" }}>
-            <HomeIcon />
-          </IconButton>
-          <IconButton sx={{ color: "#FFF" }}>
-            <GroupIcon />
-          </IconButton>
-          <IconButton sx={{ color: "#FFF" }}>
-            <ChatIcon />
-          </IconButton>
-
-          {/* Campo de busca */}
+          {/* Barra de Pesquisa */}
           <Box
             sx={{
               display: "flex",
@@ -79,30 +71,42 @@ export default function CustomAppBar() {
           </Box>
         </Box>
 
-        {/* Direita: Notificações, Chat e Avatar */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <IconButton sx={{ color: "#FFF" }}>
-            <Badge badgeContent={4} color="error">
-              <NotificationsIcon />
-            </Badge>
-          </IconButton>
-          <IconButton sx={{ color: "#FFF" }}>
-            <Badge badgeContent={2} color="error">
-              <ChatIcon />
-            </Badge>
-          </IconButton>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <Avatar
-              src="https://via.placeholder.com/40"
-              alt="User"
-              sx={{ width: 40, height: 40 }}
-            />
-            <Typography sx={{ color: "#FFF", fontWeight: "500" }}>
-              GUGA
-            </Typography>
-          </Box>
+          {username ? (
+            <>
+              <Typography sx={{ color: "#FFF" }}>{username}</Typography>
+              <Button
+                variant="contained"
+                color="secondary"
+                onClick={handleLogout}
+              >
+                Sair
+              </Button>
+            </>
+          ) : (
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleLoginOpen}
+            >
+              Logar
+            </Button>
+          )}
         </Box>
       </Toolbar>
+
+      {/* Modal (Dialog) para login */}
+      <Dialog open={open} onClose={handleLoginClose}>
+        <DialogTitle>{username ? "Você está logado!" : "Login"}</DialogTitle>
+        <DialogContent>
+          <AuthPage onClose={handleLoginClose} />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleLoginClose} color="primary">
+            Fechar
+          </Button>
+        </DialogActions>
+      </Dialog>
     </AppBar>
   );
 }
