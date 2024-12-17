@@ -203,7 +203,7 @@ export default function Dashboard() {
   return (
     <Box
       sx={{
-        backgroundColor: "#1E1E2F",
+        backgroundColor: "#1E252B",
         minHeight: "100vh",
         padding: 2,
       }}
@@ -226,7 +226,7 @@ export default function Dashboard() {
             <Box
               sx={{
                 flex: 1,
-                backgroundColor: "#2C2C3A",
+                backgroundColor: "#262D34",
                 padding: 1,
                 borderRadius: 2,
                 display: "flex",
@@ -339,7 +339,7 @@ export default function Dashboard() {
           {posts.map((post) => (
             <Card
               key={post.idpost}
-              sx={{ backgroundColor: "#2C2C3A", marginBottom: 2 }}
+              sx={{ backgroundColor: "#262D34", marginBottom: 2 }}
             >
               <CardContent>
                 <Typography sx={{ color: "#FFF", fontWeight: "bold" }}>
