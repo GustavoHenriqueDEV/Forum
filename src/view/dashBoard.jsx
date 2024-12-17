@@ -201,39 +201,26 @@ export default function Dashboard() {
   const handleClose = () => setOpen(false);
 
   return (
-    <Box sx={{ backgroundColor: "#1E1E2F", minHeight: "100vh", padding: 2 }}>
-      <Grid container spacing={2}>
-        {/* Coluna Esquerda */}
-        <Grid item xs={3}>
-          <Box sx={{ marginBottom: 2 }}>
-            <Typography
-              sx={{ color: "#FFF", fontWeight: "bold", marginBottom: 1 }}
-            >
-              Newest and Recent
-            </Typography>
-            <Card sx={{ backgroundColor: "#2C2C3A", padding: 2 }}>
-              <Typography sx={{ color: "#FFF" }}>
-                Find the latest update
-              </Typography>
-            </Card>
-          </Box>
-
-          <Box sx={{ marginBottom: 2 }}>
-            <Typography
-              sx={{ color: "#FFF", fontWeight: "bold", marginBottom: 1 }}
-            >
-              Popular Tags
-            </Typography>
-            <Card sx={{ backgroundColor: "#2C2C3A", padding: 2 }}>
-              <Typography sx={{ color: "#FFF" }}>#javascript</Typography>
-              <Typography sx={{ color: "#FFF" }}>#design</Typography>
-            </Card>
-          </Box>
-        </Grid>
-
+    <Box
+      sx={{
+        backgroundColor: "#1E1E2F",
+        minHeight: "100vh",
+        padding: 2,
+      }}
+    >
+      <Grid sx={{ justifyContent: "center" }} container spacing={10}>
         {/* Coluna Central */}
         <Grid item xs={6}>
-          <h1 style={{ color: "white" }}>Lista de Posts</h1>
+          <h1
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              color: "white",
+              alignContent: "center",
+            }}
+          >
+            Lista de Posts
+          </h1>
 
           <Box sx={{ display: "flex", alignItems: "center", marginBottom: 2 }}>
             <Box
@@ -361,10 +348,9 @@ export default function Dashboard() {
                 <Box
                   sx={{ display: "flex", alignItems: "center", marginTop: 1 }}
                 >
-                  <Avatar sx={{ marginRight: 1 }}>P</Avatar>
+                  <Avatar sx={{ marginRight: 1 }}></Avatar>
                   <Typography sx={{ color: "#AAA" }}>
-                    {post.nome ? post.nome : "Usuário desconhecido"} • 3 days
-                    ago
+                    {post.nome ? post.nome : "Usuário desconhecido"} •
                   </Typography>
                 </Box>
                 <Box sx={{ marginTop: 2 }}>
@@ -391,9 +377,6 @@ export default function Dashboard() {
                     <IconButton onClick={() => toggleComments(post.idpost)}>
                       <CommentIcon sx={{ color: "#FFF" }} />
                     </IconButton>
-                    <IconButton>
-                      <VisibilityIcon sx={{ color: "#FFF" }} />
-                    </IconButton>
                   </Box>
                 </Box>
 
@@ -407,17 +390,23 @@ export default function Dashboard() {
                       padding: 2,
                     }}
                   >
-                    <Typography sx={{ color: "#FFF", marginBottom: 1 }}>
-                      Comments:
-                    </Typography>
+                    <Typography
+                      sx={{ color: "#FFF", marginBottom: 1 }}
+                    ></Typography>
                     {coments[post.idpost]?.length > 0 ? (
-                      <ul>
+                      <ul style={{ padding: "0px" }}>
                         {coments[post.idpost].map((comentario) => (
-                          <li key={comentario.idcomentario}>
-                            nomeComentador:{" "}
+                          <li
+                            style={{
+                              marginBottom: "15px",
+                              listStyle: "none",
+                              color: "white",
+                            }}
+                            key={comentario.idcomentario}
+                          >
+                            {" "}
                             {comentario.usuario?.nome || "Usuário desconhecido"}
-                            <br />
-                            {comentario.conteudo}
+                            : {comentario.conteudo}
                           </li>
                         ))}
                       </ul>
@@ -456,34 +445,6 @@ export default function Dashboard() {
               </CardContent>
             </Card>
           ))}
-        </Grid>
-
-        {/* Fim da coluna do meio */}
-        {/* Coluna Direita */}
-        <Grid item xs={3}>
-          <Box sx={{ marginBottom: 2 }}>
-            <Typography
-              sx={{ color: "#FFF", fontWeight: "bold", marginBottom: 1 }}
-            >
-              Meetups
-            </Typography>
-            <Card sx={{ backgroundColor: "#2C2C3A", padding: 2 }}>
-              <Typography sx={{ color: "#FFF" }}>
-                UIHUT - Crunchbase Company Profile
-              </Typography>
-            </Card>
-          </Box>
-
-          <Box sx={{ marginBottom: 2 }}>
-            <Typography
-              sx={{ color: "#FFF", fontWeight: "bold", marginBottom: 1 }}
-            >
-              Podcasts
-            </Typography>
-            <Card sx={{ backgroundColor: "#2C2C3A", padding: 2 }}>
-              <Typography sx={{ color: "#FFF" }}>Selling a Business</Typography>
-            </Card>
-          </Box>
         </Grid>
       </Grid>
     </Box>
