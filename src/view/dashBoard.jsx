@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
   Typography,
@@ -9,6 +9,8 @@ import {
   Grid,
   Button,
   Badge,
+  Fab,
+  Autocomplete,
 } from "@mui/material";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
@@ -16,8 +18,12 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import TextField from "@mui/material/TextField";
 import FavoriteIcon from "@mui/icons-material/Favorite";
+import NavigationIcon from "@mui/icons-material/Navigation";
+import { createFilterOptions } from "@mui/material/Autocomplete";
+
+const filter = createFilterOptions();
+
 import CommentIcon from "@mui/icons-material/Comment";
-import VisibilityIcon from "@mui/icons-material/Visibility";
 import {
   getPosts,
   createPosts,
@@ -25,15 +31,13 @@ import {
   createComentario,
   incrementLikes,
 } from "../service/service"; // Ajuste o
-import { color } from "@mui/system";
 
 export default function Dashboard() {
   const [posts, setPosts] = useState([]);
+  const [value, setValue] = useState(null);
   const [coments, setComents] = useState([]);
-  const [likes, setLikes] = useState(posts.likes);
   const [newComment, setNewComment] = useState({});
   const [openComments, setOpenComments] = useState({});
-  const [userName, setUserName] = useState("");
   const [newPost, setNewPost] = useState({
     titulo: "",
     tipo: "",
@@ -183,17 +187,19 @@ export default function Dashboard() {
     }
   };
 
-  useEffect(() => {
-    const fetchName = async () => {
-      try {
-        const localName = localStorage.username;
-        setUserName(localName);
-      } catch (error) {
-        console.error("Erro ao buscar o nome", error);
-      }
-    };
-    fetchName;
-  });
+  const top100Films = [
+    { title: "The Shawshank Redemption", year: 1994 },
+    { title: "The Godfather", year: 1972 },
+    { title: "The Godfather: Part II", year: 1974 },
+    { title: "The Dark Knight", year: 2008 },
+    { title: "12 Angry Men", year: 1957 },
+    { title: "Schindler's List", year: 1993 },
+    { title: "Pulp Fiction", year: 1994 },
+    {
+      title: "The Lord of the Rings: The Return of the King",
+      year: 2003,
+    },
+  ];
 
   const [open, setOpen] = useState(false);
 
@@ -209,49 +215,66 @@ export default function Dashboard() {
       }}
     >
       <Grid sx={{ justifyContent: "center" }} container spacing={10}>
-        {/* Coluna Central */}
         <Grid item xs={6}>
-          <h1
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              color: "white",
-              alignContent: "center",
-            }}
-          >
-            Lista de Posts
-          </h1>
-
           <Box sx={{ display: "flex", alignItems: "center", marginBottom: 2 }}>
             <Box
               sx={{
+                height: 86,
+                width: 785,
                 flex: 1,
                 backgroundColor: "#262D34",
                 padding: 1,
-                borderRadius: 2,
+                borderRadius: 4,
                 display: "flex",
                 alignItems: "center",
               }}
             >
-              <Typography sx={{ color: "#FFF" }}>
-                Share what's on your mind...
-              </Typography>
+              <Box
+                sx={{
+                  flex: 1,
+                  height: 46,
+                  width: 553,
+                  mt: 1.3,
+                  ml: 2,
+                  backgroundColor: "#2C353D",
+                  padding: 1,
+                  borderRadius: 2,
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                <Typography sx={{ color: "#FFF" }}>
+                  Share what's on your mind...
+                </Typography>
+              </Box>
+              <Button
+                onClick={handleOpen}
+                variant="contained"
+                sx={{
+                  backgroundColor: "#FF6934",
+                  marginLeft: 2,
+                  mt: 1.2,
+                  borderRadius: 4,
+                  height: 61,
+                  width: 142,
+                  fontSize: 15,
+                  fontWeight: "bold",
+                  fontFamily: "Rubik, sans-serif",
+                  textTransform: "none",
+                }}
+              >
+                Create Post
+              </Button>
             </Box>
-            <Button
-              onClick={handleOpen}
-              variant="contained"
-              sx={{ backgroundColor: "#FF6F00", marginLeft: 2 }}
-            >
-              Create Post
-            </Button>
+
             <Dialog
               sx={{
                 "& .MuiDialog-paper": {
                   width: "80%",
-                  backgroundColor: "#262D34", // Fundo do modal na cor do site
-                  color: "white", // Personaliza largura (80% da tela)
-                  height: "70%", // Personaliza altura (70% da tela)
-                  borderRadius: "16px", // Arredonda as bordas
+                  backgroundColor: "#262D34",
+                  color: "white",
+                  height: "70%",
+                  borderRadius: "16px",
                 },
               }}
               open={open}
@@ -322,6 +345,69 @@ export default function Dashboard() {
                   }
                   variant="outlined"
                 />
+                <Autocomplete
+                  value={value}
+                  onChange={(event, newValue) => {
+                    if (typeof newValue === "string") {
+                      setValue({
+                        title: newValue,
+                      });
+                    } else if (newValue && newValue.inputValue) {
+                      setValue({
+                        title: newValue.inputValue,
+                      });
+                    } else {
+                      setValue(newValue);
+                    }
+                  }}
+                  filterOptions={(options, params) => {
+                    const filtered = filter(options, params);
+
+                    const { inputValue } = params;
+                    const isExisting = options.some(
+                      (option) => inputValue === option.title
+                    );
+                    if (inputValue !== "" && !isExisting) {
+                      filtered.push({
+                        inputValue,
+                        title: `Add "${inputValue}"`,
+                      });
+                    }
+
+                    return filtered;
+                  }}
+                  selectOnFocus
+                  clearOnBlur
+                  handleHomeEndKeys
+                  id="free-solo-with-text-demo"
+                  options={top100Films}
+                  getOptionLabel={(option) => {
+                    if (typeof option === "string") {
+                      return option;
+                    }
+                    if (option.inputValue) {
+                      return option.inputValue;
+                    }
+                    return option.title;
+                  }}
+                  renderOption={(props, option) => {
+                    const { key, ...optionProps } = props;
+                    return (
+                      <li key={key} {...optionProps}>
+                        {option.title}
+                      </li>
+                    );
+                  }}
+                  sx={{ color: "white", width: 300 }}
+                  freeSolo
+                  renderInput={(params) => (
+                    <TextField
+                      sx={{ color: "white" }}
+                      {...params}
+                      label="Qual o tipo de post?"
+                    />
+                  )}
+                />
               </DialogContent>
               <DialogActions>
                 <Button onClick={handleClose} color="secondary">
@@ -333,31 +419,81 @@ export default function Dashboard() {
               </DialogActions>
             </Dialog>
           </Box>
-
-          {/* Posts */}
-
           {posts.map((post) => (
             <Card
               key={post.idpost}
-              sx={{ backgroundColor: "#262D34", marginBottom: 2 }}
+              sx={{
+                backgroundColor: "#262D34",
+                borderRadius: 4,
+                marginBottom: 2,
+              }}
             >
               <CardContent>
-                <Typography sx={{ color: "#FFF", fontWeight: "bold" }}>
-                  {post.titulo}
-                </Typography>
+                <Box sx={{ display: "flex", justifyContent: " space-between" }}>
+                  <Typography sx={{ color: "#FFF", fontWeight: "bold" }}>
+                    {post.titulo}
+                  </Typography>
+                  <Button onClick={() => handleLike(post.idpost)}>
+                    <IconButton>
+                      <Badge badgeContent={post.likes} color="error">
+                        <FavoriteIcon sx={{ color: "white" }} />
+                      </Badge>
+                    </IconButton>
+                  </Button>
+                </Box>
                 <Box
                   sx={{ display: "flex", alignItems: "center", marginTop: 1 }}
                 >
-                  <Avatar sx={{ marginRight: 1 }}></Avatar>
+                  <Avatar sx={{ marginRight: 1 }} />
                   <Typography sx={{ color: "#AAA" }}>
                     {post.nome ? post.nome : "Usuário desconhecido"} •
                   </Typography>
                 </Box>
-                <Box sx={{ marginTop: 2 }}>
-                  <Typography sx={{ color: "#FFF" }}>
-                    {post.conteudo}
-                  </Typography>
+
+                <Box sx={{ display: "flex", marginTop: 2, gap: 2 }}>
+                  <Box>
+                    <Typography sx={{ color: "#FFF", flex: 1 }}>
+                      {post.conteudo}
+                    </Typography>
+
+                    <Fab
+                      sx={{
+                        fontSize: "12px",
+                        mt: "3px",
+                        mr: "5px",
+                        width: "80px",
+                      }}
+                      variant="extended"
+                    >
+                      {post.tipo}
+                    </Fab>
+                  </Box>
+
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      borderRadius: 2,
+                      overflow: "hidden",
+                      backgroundColor: "#444",
+                      ml: "40px",
+                      width: "550px", // Largura fixa da imagem
+                      height: "250px", // Altura fixa da imagem
+                    }}
+                  >
+                    <img
+                      src="https://via.placeholder.com/250"
+                      alt="Ilustração do Post"
+                      style={{
+                        maxWidth: "100%",
+                        maxHeight: "100%",
+                        objectFit: "cover",
+                      }}
+                    />
+                  </Box>
                 </Box>
+
                 <Box
                   sx={{
                     display: "flex",
@@ -366,21 +502,14 @@ export default function Dashboard() {
                     marginTop: 2,
                   }}
                 >
+                  {/* Botões de interação */}
                   <Box sx={{ display: "flex", gap: 2 }}>
-                    <Button onClick={() => handleLike(post.idpost)}>
-                      <IconButton>
-                        <Badge badgeContent={post.likes} color="error">
-                          <FavoriteIcon sx={{ color: "#FF6F00" }} />
-                        </Badge>
-                      </IconButton>
-                    </Button>
                     <IconButton onClick={() => toggleComments(post.idpost)}>
                       <CommentIcon sx={{ color: "#FFF" }} />
                     </IconButton>
                   </Box>
                 </Box>
 
-                {/* Comentários - Renderização Condicional */}
                 {openComments[post.idpost] && (
                   <Box
                     sx={{
@@ -390,9 +519,6 @@ export default function Dashboard() {
                       padding: 2,
                     }}
                   >
-                    <Typography
-                      sx={{ color: "#FFF", marginBottom: 1 }}
-                    ></Typography>
                     {coments[post.idpost]?.length > 0 ? (
                       <ul style={{ padding: "0px" }}>
                         {coments[post.idpost].map((comentario) => (
@@ -404,7 +530,6 @@ export default function Dashboard() {
                             }}
                             key={comentario.idcomentario}
                           >
-                            {" "}
                             {comentario.usuario?.nome || "Usuário desconhecido"}
                             : {comentario.conteudo}
                           </li>
@@ -415,8 +540,9 @@ export default function Dashboard() {
                         Nenhum comentário.
                       </Typography>
                     )}
+
                     <TextField
-                      placeholder="Write a comment..."
+                      placeholder="Escreva um comentário..."
                       variant="outlined"
                       fullWidth
                       value={newComment[post.idpost] || ""}

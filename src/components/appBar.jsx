@@ -47,7 +47,6 @@ export default function CustomAppBar() {
             gap: 2,
           }}
         >
-          {/* Barra de Pesquisa */}
           <Box
             sx={{
               display: "flex",
@@ -76,8 +75,9 @@ export default function CustomAppBar() {
             <>
               <Typography sx={{ color: "#FFF" }}>{username}</Typography>
               <Button
+                sx={{ fontSize: 11, height: 25 }}
                 variant="contained"
-                color="secondary"
+                color="blue"
                 onClick={handleLogout}
               >
                 Sair
