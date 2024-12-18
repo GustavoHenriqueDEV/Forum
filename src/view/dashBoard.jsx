@@ -402,9 +402,28 @@ export default function Dashboard() {
                   freeSolo
                   renderInput={(params) => (
                     <TextField
-                      sx={{ color: "white" }}
                       {...params}
-                      label="Qual o tipo de post?"
+                      label="Qual o conteúdo do post?"
+                      InputLabelProps={{
+                        style: { color: "white" },
+                      }}
+                      InputProps={{
+                        ...params.InputProps,
+                        style: { color: "white" },
+                      }}
+                      sx={{
+                        "& .MuiOutlinedInput-root": {
+                          "& fieldset": {
+                            borderColor: "white",
+                          },
+                          "&:hover fieldset": {
+                            borderColor: "#ff8c00",
+                          },
+                          "&.Mui-focused fieldset": {
+                            borderColor: "#ff8c00",
+                          },
+                        },
+                      }}
                     />
                   )}
                 />
