@@ -19,7 +19,6 @@ export const createPosts = async (post) => {
     const response = await axios.post(`${API_URL}/posts`, post, {
       headers: {
         "Content-Type": "application/json", // Define o tipo de conteúdo
-        // 'Authorization': 'Bearer seu_token_aqui', // Caso precise de autenticação
       },
     });
     return response.data; // Retorna os dados do novo post criado

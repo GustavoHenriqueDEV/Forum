@@ -34,6 +34,7 @@ import {
 
 export default function Dashboard() {
   const [posts, setPosts] = useState([]);
+  const [base64Image, setBase64Image] = useState("");
   const [value, setValue] = useState(null);
   const [coments, setComents] = useState([]);
   const [newComment, setNewComment] = useState({});
@@ -46,6 +47,7 @@ export default function Dashboard() {
     },
     conteudo: "",
     likes: 0,
+    imagem: "",
   });
 
   const handleLike = async (idpost) => {
@@ -119,6 +121,7 @@ export default function Dashboard() {
       const createdPost = await createPosts({
         ...newPost,
         tipo: value.title,
+        imagem: base64Image /*Isso aqui vai dar problema.*/,
         usuario: { idusuario: parseInt(idusuarioLocal) }, // Garante que o ID seja um número
       });
 
@@ -130,6 +133,7 @@ export default function Dashboard() {
         conteudo: "",
         usuario: { idusuario: "" },
         likes: 0,
+        imagem: "",
       });
       setOpen(false);
       const fetchPosts = async () => {
@@ -206,6 +210,22 @@ export default function Dashboard() {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
+  const handleImageChange = (event) => {
+    const file = event.target.files[0];
+
+    if (file) {
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        const base64Image = reader.result.split(",")[1]; // Pega a parte Base64
+        setBase64Image(base64Image); // Atualiza o estado com a string base64 da imagem
+        console.log(base64Image); // Exibe a string base64 no console
+      };
+
+      reader.readAsDataURL(file); // Lê o arquivo como URL de dados
+    }
+  };
+
   return (
     <Box
       sx={{
@@ -268,15 +288,7 @@ export default function Dashboard() {
                 Create Post
               </Button>
             </Box>
-            <Button variant="contained" component="label">
-              Escolher Imagem para converter
-              <input
-                type="file"
-                accept="image/*"
-                hidden
-                /*onChange={}*/
-              />
-            </Button>
+
             <Dialog
               sx={{
                 "& .MuiDialog-paper": {
@@ -359,6 +371,15 @@ export default function Dashboard() {
                   }
                   variant="outlined"
                 />
+                <Button variant="contained" component="label">
+                  Escolher Imagem para converter
+                  <input
+                    type="file"
+                    accept="image/*"
+                    hidden
+                    onChange={handleImageChange}
+                  />
+                </Button>
                 <Autocomplete
                   value={value}
                   onChange={(event, newValue) => {
