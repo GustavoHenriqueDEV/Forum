@@ -187,7 +187,6 @@ export default function Dashboard() {
       alert("Erro ao publicar comentário.");
     }
   };
-
   const top100Films = [
     { title: "The Shawshank Redemption", year: 1994 },
     { title: "The Godfather", year: 1972 },
@@ -269,7 +268,15 @@ export default function Dashboard() {
                 Create Post
               </Button>
             </Box>
-
+            <Button variant="contained" component="label">
+              Escolher Imagem para converter
+              <input
+                type="file"
+                accept="image/*"
+                hidden
+                /*onChange={}*/
+              />
+            </Button>
             <Dialog
               sx={{
                 "& .MuiDialog-paper": {
