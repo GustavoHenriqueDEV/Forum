@@ -118,6 +118,7 @@ export default function Dashboard() {
     try {
       const createdPost = await createPosts({
         ...newPost,
+        tipo: value.title,
         usuario: { idusuario: parseInt(idusuarioLocal) }, // Garante que o ID seja um número
       });
 
