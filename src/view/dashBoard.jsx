@@ -244,7 +244,9 @@ export default function Dashboard() {
                   alignItems: "center",
                 }}
               >
-                <Typography sx={{ color: "#FFF" }}>
+                <Typography
+                  sx={{ fontFamily: "Rubik, sans-serif", color: "#FFF" }}
+                >
                   Share what's on your mind...
                 </Typography>
               </Box>
@@ -295,6 +297,8 @@ export default function Dashboard() {
                     style: { color: "white", borderColor: "white" },
                   }}
                   sx={{
+                    fontFamily: "Rubik, sans-serif",
+
                     "& .MuiOutlinedInput-root": {
                       "& fieldset": {
                         borderColor: "white",
@@ -328,6 +332,8 @@ export default function Dashboard() {
                     style: { color: "white", borderColor: "white" },
                   }}
                   sx={{
+                    fontFamily: "Rubik, sans-serif",
+
                     "& .MuiOutlinedInput-root": {
                       "& fieldset": {
                         borderColor: "white",
@@ -443,14 +449,30 @@ export default function Dashboard() {
             <Card
               key={post.idpost}
               sx={{
+                fontFamily: "Rubik, sans-serif",
+
                 backgroundColor: "#262D34",
                 borderRadius: 4,
                 marginBottom: 2,
               }}
             >
               <CardContent>
-                <Box sx={{ display: "flex", justifyContent: " space-between" }}>
-                  <Typography sx={{ color: "#FFF", fontWeight: "bold" }}>
+                <Box
+                  sx={{
+                    fontFamily: "Rubik, sans-serif",
+                    display: "flex",
+                    justifyContent: " space-between",
+                  }}
+                >
+                  <Typography
+                    sx={{
+                      fontFamily: "Rubik, sans-serif",
+                      ml: "350px",
+                      color: "#FFF",
+                      fontSize: "20px",
+                      fontWeight: "bold",
+                    }}
+                  >
                     {post.titulo}
                   </Typography>
                   <Button onClick={() => handleLike(post.idpost)}>
@@ -462,26 +484,53 @@ export default function Dashboard() {
                   </Button>
                 </Box>
                 <Box
-                  sx={{ display: "flex", alignItems: "center", marginTop: 1 }}
+                  sx={{
+                    fontFamily: "Rubik, sans-serif",
+                    display: "flex",
+                    alignItems: "center",
+                    marginTop: 1,
+                  }}
                 >
                   <Avatar sx={{ marginRight: 1 }} />
-                  <Typography sx={{ color: "#AAA" }}>
+                  <Typography
+                    sx={{
+                      fontFamily: "Rubik, sans-serif",
+                      color: "#AAA",
+                    }}
+                  >
                     {post.nome ? post.nome : "Usuário desconhecido"} •
                   </Typography>
                 </Box>
 
-                <Box sx={{ display: "flex", marginTop: 2, gap: 2 }}>
+                <Box
+                  sx={{
+                    fontFamily: "Rubik, sans-serif",
+                    display: "flex",
+                    justifyContent: "space-around",
+                    marginTop: 2,
+                    gap: 2,
+                  }}
+                >
                   <Box>
-                    <Typography sx={{ color: "#FFF", flex: 1 }}>
+                    <Typography
+                      sx={{
+                        fontFamily: "Rubik, sans-serif",
+                        color: "#FFF",
+                        flex: 1,
+                        mr: "230px",
+                      }}
+                    >
                       {post.conteudo}
                     </Typography>
 
                     <Fab
                       sx={{
+                        fontFamily: "Rubik, sans-serif",
+
                         fontSize: "12px",
                         mt: "3px",
                         mr: "5px",
-                        width: "80px",
+                        width: "150px",
                       }}
                       variant="extended"
                     >
@@ -491,14 +540,13 @@ export default function Dashboard() {
 
                   <Box
                     sx={{
+                      fontFamily: "Rubik, sans-serif",
                       display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
                       borderRadius: 2,
                       overflow: "hidden",
                       backgroundColor: "#444",
-                      ml: "40px",
-                      width: "550px", // Largura fixa da imagem
+                      ml: "140px",
+                      width: "250px", // Largura fixa da imagem
                       height: "250px", // Altura fixa da imagem
                     }}
                   >
@@ -516,6 +564,8 @@ export default function Dashboard() {
 
                 <Box
                   sx={{
+                    fontFamily: "Rubik, sans-serif",
+
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
@@ -523,7 +573,13 @@ export default function Dashboard() {
                   }}
                 >
                   {/* Botões de interação */}
-                  <Box sx={{ display: "flex", gap: 2 }}>
+                  <Box
+                    sx={{
+                      fontFamily: "Rubik, sans-serif",
+                      display: "flex",
+                      gap: 2,
+                    }}
+                  >
                     <IconButton onClick={() => toggleComments(post.idpost)}>
                       <CommentIcon sx={{ color: "#FFF" }} />
                     </IconButton>
@@ -556,7 +612,12 @@ export default function Dashboard() {
                         ))}
                       </ul>
                     ) : (
-                      <Typography sx={{ color: "#AAA" }}>
+                      <Typography
+                        sx={{
+                          fontFamily: "Rubik, sans-serif",
+                          color: "#AAA",
+                        }}
+                      >
                         Nenhum comentário.
                       </Typography>
                     )}
