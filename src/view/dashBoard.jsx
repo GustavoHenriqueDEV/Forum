@@ -18,7 +18,6 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import TextField from "@mui/material/TextField";
 import FavoriteIcon from "@mui/icons-material/Favorite";
-import NavigationIcon from "@mui/icons-material/Navigation";
 import { createFilterOptions } from "@mui/material/Autocomplete";
 
 const filter = createFilterOptions();
@@ -47,11 +46,12 @@ export default function Dashboard() {
     },
     conteudo: "",
     likes: 0,
+    imagembase64: "",
     imagem: "",
   });
 
   const handleLike = async (idpost) => {
-    const idusuarioLocal = localStorage.getItem("idusuario"); // Obtém o ID do usuário autenticado
+    const idusuarioLocal = localStorage.getItem("idusuario");
     if (!idusuarioLocal) {
       alert("Usuário não autenticado!");
       return;
@@ -111,7 +111,7 @@ export default function Dashboard() {
   }, []);
 
   const handleCreatePost = async () => {
-    const idusuarioLocal = localStorage.getItem("idusuario"); // Recupera o ID do usuário
+    const idusuarioLocal = localStorage.getItem("idusuario");
     if (!idusuarioLocal) {
       alert("Usuário não autenticado!");
       return;
@@ -121,19 +121,18 @@ export default function Dashboard() {
       const createdPost = await createPosts({
         ...newPost,
         tipo: value.title,
-        imagem: base64Image /*Isso aqui vai dar problema.*/,
-        usuario: { idusuario: parseInt(idusuarioLocal) }, // Garante que o ID seja um número
+        imagem: base64Image,
+        usuario: { idusuario: parseInt(idusuarioLocal) },
       });
 
       setPosts((prevPosts) => [...prevPosts, createdPost]);
-      // Limpa o formulário
       setNewPost({
         titulo: "",
         tipo: "",
         conteudo: "",
         usuario: { idusuario: "" },
         likes: 0,
-        imagem: "",
+        imagembase64: "",
       });
       setOpen(false);
       const fetchPosts = async () => {
@@ -215,13 +214,11 @@ export default function Dashboard() {
 
     if (file) {
       const reader = new FileReader();
-
       reader.onload = () => {
         const base64Image = reader.result.split(",")[1]; // Pega a parte Base64
         setBase64Image(base64Image); // Atualiza o estado com a string base64 da imagem
         console.log(base64Image); // Exibe a string base64 no console
       };
-
       reader.readAsDataURL(file); // Lê o arquivo como URL de dados
     }
   };
@@ -579,7 +576,7 @@ export default function Dashboard() {
                     }}
                   >
                     <img
-                      src="https://via.placeholder.com/250"
+                      src={`data:image/png;base64,${post.imagembase64}`}
                       alt="Ilustração do Post"
                       style={{
                         maxWidth: "100%",
