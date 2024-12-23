@@ -13,6 +13,20 @@ export const getPosts = async () => {
   }
 };
 
+export const getPostById = async (id) => {
+  try {
+    const response = await axios.post(`${API_URL}/posts/${id}`, {
+      headers: {
+        "Content-Type": "application/json", // Define o tipo de conteúdo
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao buscar o post especifico");
+    throw error;
+  }
+};
+
 // Função POST para criar um novo post
 export const createPosts = async (post) => {
   try {

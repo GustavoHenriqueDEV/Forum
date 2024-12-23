@@ -29,7 +29,8 @@ import {
   getComentariosByPost,
   createComentario,
   incrementLikes,
-} from "../service/service"; // Ajuste o
+} from "../service/service";
+import { Navigate, useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
   const [posts, setPosts] = useState([]);
@@ -50,6 +51,11 @@ export default function Dashboard() {
     imagem: "",
   });
 
+  const navigate = useNavigate();
+  const handlePostClick = (idpost) => {
+    navigate(`/post/${idpost}`);
+  };
+
   const handleLike = async (idpost) => {
     const idusuarioLocal = localStorage.getItem("idusuario");
     if (!idusuarioLocal) {
@@ -61,7 +67,7 @@ export default function Dashboard() {
       const updatedLikes = await incrementLikes(
         idpost,
         parseInt(idusuarioLocal)
-      ); // Passa o ID do usuário
+      );
       setPosts((prevPosts) =>
         prevPosts.map((post) =>
           post.idpost === idpost ? { ...post, likes: updatedLikes } : post
@@ -80,7 +86,6 @@ export default function Dashboard() {
       [id]: !isOpen,
     }));
 
-    // Apenas busca comentários se ainda não foi aberto
     if (!isOpen && !coments[id]) {
       fetchComent(id);
     }
@@ -92,7 +97,7 @@ export default function Dashboard() {
       setComents((prevState) => ({
         ...prevState,
         [idpost]: comentData,
-      })); // Armazena comentários por ID do post
+      }));
     } catch (error) {
       console.error(`Erro ao buscar comentários para o post ${idpost}:`, error);
     }
@@ -109,7 +114,6 @@ export default function Dashboard() {
     };
     fetchPosts();
   }, []);
-
   const handleCreatePost = async () => {
     const idusuarioLocal = localStorage.getItem("idusuario");
     if (!idusuarioLocal) {
@@ -173,7 +177,6 @@ export default function Dashboard() {
         [idpost]: "",
       }));
 
-      // Atualiza o post na lista
       setPosts((prevPosts) =>
         prevPosts.map((post) =>
           post.idpost === idpost
@@ -205,7 +208,6 @@ export default function Dashboard() {
   ];
 
   const [open, setOpen] = useState(false);
-
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
@@ -215,11 +217,11 @@ export default function Dashboard() {
     if (file) {
       const reader = new FileReader();
       reader.onload = () => {
-        const base64Image = reader.result.split(",")[1]; // Pega a parte Base64
-        setBase64Image(base64Image); // Atualiza o estado com a string base64 da imagem
-        console.log(base64Image); // Exibe a string base64 no console
+        const base64Image = reader.result.split(",")[1];
+        setBase64Image(base64Image);
+        console.log(base64Image);
       };
-      reader.readAsDataURL(file); // Lê o arquivo como URL de dados
+      reader.readAsDataURL(file);
     }
   };
 
@@ -472,6 +474,7 @@ export default function Dashboard() {
           </Box>
           {posts.map((post) => (
             <Card
+              onClick={() => handlePostClick(post.idpost)}
               key={post.idpost}
               sx={{
                 fontFamily: "Rubik, sans-serif",

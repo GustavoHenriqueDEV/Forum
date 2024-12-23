@@ -1,11 +1,18 @@
-import DashBoard from "./view/dashBoard";
+import React from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import Dashboard from "./view/dashBoard";
+import PostContent from "./view/postContent";
 import CustomAppBar from "./components/appBar";
 
-export default function app() {
+export default function App() {
   return (
-    <div>
+    <Router>
       <CustomAppBar />
-      <DashBoard />
-    </div>
+
+      <Routes>
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/post/:idpost" element={<PostContent />} />
+      </Routes>
+    </Router>
   );
 }
