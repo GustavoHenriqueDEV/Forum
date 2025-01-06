@@ -503,7 +503,10 @@ export default function Dashboard() {
                   >
                     {post.titulo}
                   </Typography>
-                  <Button onClick={() => handleLike(post.idpost)}>
+                  <Button onClick={(e) => { 
+                    e.stopPropagation();
+                    handleLike(post.idpost)
+                    }}>
                     <IconButton>
                       <Badge badgeContent={post.likes} color="error">
                         <FavoriteIcon sx={{ color: "white" }} />
@@ -608,7 +611,10 @@ export default function Dashboard() {
                       gap: 2,
                     }}
                   >
-                    <IconButton onClick={() => toggleComments(post.idpost)}>
+                    <IconButton onClick={(e) => {
+                      e.stopPropagation();
+                      toggleComments(post.idpost)
+                    }}>
                       <CommentIcon sx={{ color: "#FFF" }} />
                     </IconButton>
                   </Box>
@@ -667,9 +673,12 @@ export default function Dashboard() {
                         borderRadius: 1,
                         input: { color: "#FFF" },
                       }}
+                      onClick={(e) => e.stopPropagation()}
                     />
                     <Button
-                      onClick={() => handleCreateComment(post.idpost)}
+                      onClick={(e) => {
+                      e.stopPropagation();
+                      handleCreateComment(post.idpost)}}
                       variant="contained"
                       sx={{ backgroundColor: "#FF6F00", marginTop: 1 }}
                     >
