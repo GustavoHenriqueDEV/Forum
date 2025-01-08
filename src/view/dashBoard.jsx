@@ -489,50 +489,42 @@ export default function Dashboard() {
                   sx={{
                     fontFamily: "Rubik, sans-serif",
                     display: "flex",
-                    justifyContent: " space-between",
+                    justifyContent: "",
                   }}
                 >
+
+                <Typography
+                    sx={{
+                      display:"flex",
+                      fontFamily: "Rubik, sans-serif",
+                      color: "#FFF",
+                      fontSize: "13px",
+                      fontWeight: "bold",
+                    }}
+                  > 
+                  <Avatar sx={{   width:"23px", height:"23px",  marginRight: 1 }} />
+
+                  {post.nome}
+                  </Typography>
                   <Typography
                     sx={{
                       fontFamily: "Rubik, sans-serif",
-                      ml: "350px",
                       color: "#FFF",
                       fontSize: "20px",
                       fontWeight: "bold",
+                      ml:"282px",
+                      mb:"10px",
                     }}
-                  >
+                  > 
                     {post.titulo}
                   </Typography>
-                  <Button onClick={(e) => { 
-                    e.stopPropagation();
-                    handleLike(post.idpost)
-                    }}>
-                    <IconButton>
-                      <Badge badgeContent={post.likes} color="error">
-                        <FavoriteIcon sx={{ color: "white" }} />
-                      </Badge>
-                    </IconButton>
-                  </Button>
+                  
                 </Box>
                 <Box
-                  sx={{
-                    fontFamily: "Rubik, sans-serif",
-                    display: "flex",
-                    alignItems: "center",
-                    marginTop: 1,
-                  }}
-                >
-                  <Avatar sx={{ marginRight: 1 }} />
-                  <Typography
                     sx={{
-                      fontFamily: "Rubik, sans-serif",
-                      color: "#AAA",
+                      borderBottom: "3px solid #444", // Estilo da linha
                     }}
-                  >
-                    {post.nome ? post.nome : "Usuário desconhecido"} •
-                  </Typography>
-                </Box>
-
+                  />
                 <Box
                   sx={{
                     fontFamily: "Rubik, sans-serif",
@@ -542,32 +534,7 @@ export default function Dashboard() {
                     gap: 2,
                   }}
                 >
-                  <Box>
-                    <Typography
-                      sx={{
-                        fontFamily: "Rubik, sans-serif",
-                        color: "#FFF",
-                        flex: 1,
-                        mr: "230px",
-                      }}
-                    >
-                      {post.conteudo}
-                    </Typography>
-
-                    <Fab
-                      sx={{
-                        fontFamily: "Rubik, sans-serif",
-
-                        fontSize: "12px",
-                        mt: "3px",
-                        mr: "5px",
-                        width: "150px",
-                      }}
-                      variant="extended"
-                    >
-                      {post.tipo}
-                    </Fab>
-                  </Box>
+                 
 
                   <Box
                     sx={{
@@ -576,9 +543,9 @@ export default function Dashboard() {
                       borderRadius: 2,
                       overflow: "hidden",
                       backgroundColor: "#444",
-                      ml: "140px",
-                      width: "250px", // Largura fixa da imagem
-                      height: "250px", // Altura fixa da imagem
+                      ml: "60px",
+                      width: "500px", // Largura fixa da imagem
+                      height: "400px", // Altura fixa da imagem
                     }}
                   >
                     <img
@@ -592,6 +559,20 @@ export default function Dashboard() {
                     />
                   </Box>
                 </Box>
+                <Box>                   
+                    <Fab
+                      sx={{
+                        fontFamily: "Rubik, sans-serif",
+                        fontSize: "12px",
+                        mt: "3px",
+                        mr: "5px",
+                        height:"35px"
+                      }}
+                      variant="extended"
+                    >
+                      {post.tipo}
+                    </Fab>
+                  </Box>
 
                 <Box
                   sx={{
@@ -611,6 +592,18 @@ export default function Dashboard() {
                       gap: 2,
                     }}
                   >
+                    <Box > 
+                  <Button onClick={(e) => { 
+                    e.stopPropagation();
+                    handleLike(post.idpost)
+                    }}>
+                    <IconButton   >
+                      <Badge badgeContent={post.likes} color="error">
+                        <FavoriteIcon sx={{  color: "white" }} />
+                      </Badge>
+                    </IconButton>
+                  </Button>    
+                  </Box>
                     <IconButton onClick={(e) => {
                       e.stopPropagation();
                       toggleComments(post.idpost)
@@ -639,7 +632,7 @@ export default function Dashboard() {
                               color: "white",
                             }}
                             key={comentario.idcomentario}
-                          >
+                          >z 
                             {comentario.usuario?.nome || "Usuário desconhecido"}
                             : {comentario.conteudo}
                           </li>

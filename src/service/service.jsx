@@ -15,7 +15,7 @@ export const getPosts = async () => {
 
 export const getPostById = async (id) => {
   try {
-    const response = await axios.post(`${API_URL}/posts/${id}`, {
+    const response = await axios.get(`${API_URL}/posts/${id}`, {
       headers: {
         "Content-Type": "application/json", // Define o tipo de conteúdo
       },
