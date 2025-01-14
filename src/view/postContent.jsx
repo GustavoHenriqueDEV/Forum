@@ -1,10 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getPostById, getComentariosByPost, createComentario } from "../service/service";
+import {
+  getPostById,
+  getComentariosByPost,
+  createComentario,
+  createResposta,
+  getRespostasByComentario,
+} from "../service/service";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import CommentIcon from "@mui/icons-material/Comment";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Sidebar from "../components/Sidebar";
+
 import {
   Box,
   Typography,
@@ -15,17 +22,31 @@ import {
   IconButton,
   Badge,
   Avatar,
+  Collapse,
 } from "@mui/material";
 
 export default function PostContent() {
   const { idpost } = useParams();
   const navigate = useNavigate();
+
+  // Estado do post
   const [post, setPost] = useState(null);
+
+  // Estado dos comentários
   const [comments, setComments] = useState([]);
+
+  // Estado de loading e error
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Estado para novo comentário
   const [newComment, setNewComment] = useState("");
+
+  // Controle de exibição dos comentários
   const [openComments, setOpenComments] = useState(false);
+
+  // ---------------- NOVOS ESTADOS PARA RESPOSTAS ----------------
+  const [respostasPorComentario, setRespostasPorComentario] = useState({});
 
   useEffect(() => {
     const fetchData = async () => {
@@ -36,6 +57,17 @@ export default function PostContent() {
 
         const commentsData = await getComentariosByPost(idpost);
         setComments(commentsData);
+
+        // Inicializando o objeto de respostas
+        const inicial = {};
+        commentsData.forEach((comment) => {
+          inicial[comment.idcomentario] = {
+            respostas: [],
+            aberto: false,
+            novaResposta: "",
+          };
+        });
+        setRespostasPorComentario(inicial);
       } catch (error) {
         console.error("Erro ao carregar os dados:", error);
         setError("Não foi possível carregar os dados do post e comentários.");
@@ -47,10 +79,12 @@ export default function PostContent() {
     fetchData();
   }, [idpost]);
 
+  // Toggle para abrir/fechar a lista de comentários
   const handleToggleComments = () => {
     setOpenComments(!openComments);
   };
 
+  // Cria um comentário
   const handleCreateComment = async () => {
     const idusuarioLocal = localStorage.getItem("idusuario");
     if (!idusuarioLocal) {
@@ -65,13 +99,107 @@ export default function PostContent() {
       };
 
       const createdComment = await createComentario(idpost, comentario);
+
+      // Adiciona novo comentário ao estado
       setComments((prevComments) => [...prevComments, createdComment]);
+
+      // Inicializa a entrada no objeto de respostas
+      setRespostasPorComentario((prevState) => ({
+        ...prevState,
+        [createdComment.idcomentario]: {
+          respostas: [],
+          aberto: false,
+          novaResposta: "",
+        },
+      }));
+
+      // Limpa o campo
       setNewComment("");
     } catch (error) {
       console.error("Erro ao criar comentário:", error);
       alert("Erro ao publicar comentário.");
     }
   };
+
+  // ---------------- MANIPULAÇÃO DE RESPOSTAS ----------------
+
+  // Handle para exibir/ocultar respostas de um comentário
+  const handleToggleRespostas = async (idcomentario) => {
+    const jaAberto = respostasPorComentario[idcomentario]?.aberto;
+
+    // Se não estiver aberto, ao abrir, buscamos as respostas no servidor
+    if (!jaAberto) {
+      try {
+        const respostas = await getRespostasByComentario(idcomentario);
+        setRespostasPorComentario((prev) => ({
+          ...prev,
+          [idcomentario]: {
+            ...prev[idcomentario],
+            respostas: respostas,
+            aberto: true,
+          },
+        }));
+      } catch (error) {
+        console.error("Erro ao buscar respostas:", error);
+      }
+    } else {
+      // Se já estiver aberto, apenas ocultamos
+      setRespostasPorComentario((prev) => ({
+        ...prev,
+        [idcomentario]: {
+          ...prev[idcomentario],
+          aberto: false,
+        },
+      }));
+    }
+  };
+
+  // Atualiza o campo de nova resposta
+  const handleChangeNovaResposta = (idcomentario, valor) => {
+    setRespostasPorComentario((prev) => ({
+      ...prev,
+      [idcomentario]: {
+        ...prev[idcomentario],
+        novaResposta: valor,
+      },
+    }));
+  };
+
+  // Cria uma nova resposta para um comentário
+  // ...
+const handleCreateResposta = async (idcomentario) => {
+  const idusuarioLocal = localStorage.getItem("idusuario");
+  if (!idusuarioLocal) {
+    alert("Usuário não autenticado!");
+    return;
+  }
+
+  try {
+    // Mude aqui:
+    const respostaBody = {
+      conteudo: respostasPorComentario[idcomentario].novaResposta,
+      idUsuario: parseInt(idusuarioLocal),
+    };
+
+    const createdResposta = await createResposta(idcomentario, respostaBody);
+
+    // Atualiza o estado para incluir a nova resposta
+    setRespostasPorComentario((prev) => ({
+      ...prev,
+      [idcomentario]: {
+        ...prev[idcomentario],
+        respostas: [...prev[idcomentario].respostas, createdResposta],
+        novaResposta: "", // limpa o campo
+      },
+    }));
+  } catch (error) {
+    console.error("Erro ao criar resposta:", error);
+    alert("Erro ao publicar resposta.");
+  }
+};
+
+
+  // ---------------- RENDERIZAÇÃO PRINCIPAL ----------------
 
   if (loading) {
     return (
@@ -112,15 +240,18 @@ export default function PostContent() {
       style={{
         display: "flex",
         paddingTop: "64px",
+        marginTop:"20px",
         minHeight: "100vh",
         width: "100%",
         backgroundColor: "#17202a",
       }}
     >
-    <div style={{ zIndex: 1000, overflow: "hidden", backgroundColor: "#17202a" }}>
-  <Sidebar />
-</div>
+      {/* SIDEBAR */}
+      <div style={{ zIndex: 1000, overflow: "hidden", backgroundColor: "#17202a" }}>
+        <Sidebar />
+      </div>
 
+      {/* CONTEÚDO PRINCIPAL DO POST */}
       <Box
         p={3}
         maxWidth={800}
@@ -129,9 +260,9 @@ export default function PostContent() {
         boxShadow={3}
         borderRadius={2}
         color="#FFF"
-        
-        sx={{ width: "80%" }} // Estilo para o MainContent
+        sx={{ height:"90%", width: "70%" }}
       >
+        {/* TÍTULO E AVATAR */}
         <Typography
           sx={{
             display: "flex",
@@ -146,6 +277,7 @@ export default function PostContent() {
           {post.usuario.nome || "erro"}
         </Typography>
 
+        {/* TÍTULO DO POST */}
         <Typography
           sx={{
             fontFamily: "Rubik, sans-serif",
@@ -158,6 +290,7 @@ export default function PostContent() {
           {post.titulo || "Conteúdo indisponível"}
         </Typography>
 
+        {/* CONTEÚDO DO POST */}
         <Typography
           letterSpacing={1}
           fontSize={14}
@@ -167,6 +300,8 @@ export default function PostContent() {
         >
           {post.conteudo || "Conteúdo indisponível"}
         </Typography>
+
+        {/* IMAGEM DO POST */}
         {post.imagembase64 && (
           <Box
             component="img"
@@ -181,14 +316,9 @@ export default function PostContent() {
         )}
         <Box sx={{ borderBottom: "3px solid #444" }} />
 
-        <Button onClick={(e) => e.stopPropagation()}>
-          <IconButton>
-            <Badge badgeContent={post.likes} color="error">
-              <FavoriteIcon sx={{ color: "white" }} />
-            </Badge>
-          </IconButton>
-        </Button>
+       
 
+        {/* BOTÃO MOSTRAR/OCULTAR COMENTÁRIOS */}
         <Button
           variant="contained"
           style={{
@@ -205,7 +335,8 @@ export default function PostContent() {
           {openComments ? "Ocultar Comentários" : "Mostrar Comentários"}
         </Button>
 
-        {openComments && (
+        {/* SEÇÃO DE COMENTÁRIOS */}
+        <Collapse in={openComments} timeout="auto" unmountOnExit>
           <Box mt={4} bgcolor="#1E252B" p={3} borderRadius={2}>
             <Typography variant="h5" style={{ color: "#00D1B2" }} gutterBottom>
               Comentários
@@ -213,7 +344,7 @@ export default function PostContent() {
             {comments.length > 0 ? (
               comments.map((comment) => (
                 <Paper
-                  key={comment.id}
+                  key={comment.idcomentario}
                   elevation={2}
                   style={{
                     backgroundColor: "#2A2F38",
@@ -222,12 +353,101 @@ export default function PostContent() {
                     borderRadius: "8px",
                   }}
                 >
+                  {/* Nome do usuário */}
                   <Typography style={{ color: "#FFF", fontWeight: "bold" }}>
                     {comment.usuario?.nome || "Anônimo"}:
                   </Typography>
-                  <Typography style={{ color: "#D4D4D4" }}>
+
+                  {/* Conteúdo do comentário */}
+                  <Typography style={{ color: "#D4D4D4", marginBottom: 8 }}>
                     {comment.conteudo || "Sem conteúdo"}
                   </Typography>
+
+                  {/* BOTÃO DE VER RESPOSTAS */}
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    sx={{ borderColor: "#00D1B2", color: "#00D1B2", mb: 1 }}
+                    onClick={() => handleToggleRespostas(comment.idcomentario)}
+                  >
+                    {respostasPorComentario[comment.idcomentario]?.aberto
+                      ? "Ocultar Respostas"
+                      : "Ver Respostas"}
+                  </Button>
+
+                  {/* SEÇÃO DE RESPOSTAS (EXIBIDA SE ABERTO) */}
+                  <Collapse
+                    in={respostasPorComentario[comment.idcomentario]?.aberto}
+                    timeout="auto"
+                    unmountOnExit
+                  >
+                    <Box mt={1} sx={{ pl: 2, borderLeft: "2px solid #444" }}>
+                      {respostasPorComentario[comment.idcomentario]?.respostas?.length > 0 ? (
+                        respostasPorComentario[comment.idcomentario].respostas.map((resposta) => (
+                          <Paper
+                            key={resposta.id}
+                            elevation={1}
+                            sx={{
+                              p: 1,
+                              my: 1,
+                              backgroundColor: "#1E252B",
+                              borderRadius: 1,
+                            }}
+                          >
+                            <Typography
+                              style={{ color: "#FFF", fontWeight: "bold" }}
+                              variant="body2"
+                            >
+                              {resposta.usuario?.nome || "Anônimo"}:
+                            </Typography>
+                            <Typography style={{ color: "#D4D4D4" }} variant="body2">
+                              {resposta.conteudo}
+                            </Typography>
+                          </Paper>
+                        ))
+                      ) : (
+                        <Typography
+                          variant="body2"
+                          style={{ color: "#D4D4D4", fontStyle: "italic", marginTop: 8 }}
+                        >
+                          Não há respostas ainda.
+                        </Typography>
+                      )}
+
+                      {/* CAMPO PARA NOVA RESPOSTA */}
+                      <Box mt={2} display="flex" gap={2}>
+                        <TextField
+                          fullWidth
+                          variant="outlined"
+                          placeholder="Escreva uma resposta..."
+                          value={
+                            respostasPorComentario[comment.idcomentario]?.novaResposta || ""
+                          }
+                          onChange={(e) =>
+                            handleChangeNovaResposta(comment.idcomentario, e.target.value)
+                          }
+                          style={{
+                            backgroundColor: "#2A2F38",
+                            color: "#FFF",
+                            borderRadius: "8px",
+                          }}
+                          InputProps={{
+                            style: { color: "#FFF" },
+                          }}
+                        />
+                        <Button
+                          variant="contained"
+                          style={{
+                            backgroundColor: "#00D1B2",
+                            color: "#FFF",
+                          }}
+                          onClick={() => handleCreateResposta(comment.idcomentario)}
+                        >
+                          Responder
+                        </Button>
+                      </Box>
+                    </Box>
+                  </Collapse>
                 </Paper>
               ))
             ) : (
@@ -235,6 +455,8 @@ export default function PostContent() {
                 Nenhum comentário ainda.
               </Typography>
             )}
+
+            {/* CAMPO PARA NOVO COMENTÁRIO GERAL */}
             <Box mt={2} display="flex" gap={2}>
               <TextField
                 fullWidth
@@ -263,7 +485,7 @@ export default function PostContent() {
               </Button>
             </Box>
           </Box>
-        )}
+        </Collapse>
       </Box>
     </div>
   );

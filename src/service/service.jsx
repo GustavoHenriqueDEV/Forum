@@ -136,3 +136,28 @@ export const incrementLikes = async (idpost, idusuario) => {
     throw error;
   }
 };
+// Função POST para adicionar uma resposta a um comentário
+export const createResposta = async (idComentario, resposta) => {
+  try {
+    const response = await axios.post(`${API_URL}/respostas/${idComentario}`, resposta, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return response.data; // Retorna a resposta criada
+  } catch (error) {
+    console.error(`Erro ao criar resposta para o comentário ${idComentario}:`, error);
+    throw error;
+  }
+};
+
+// Função GET para buscar respostas de um comentário específico
+export const getRespostasByComentario = async (idComentario) => {
+  try {
+    const response = await axios.get(`${API_URL}/respostas/${idComentario}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Erro ao buscar respostas do comentário ${idComentario}:`, error);
+    throw error;
+  }
+};

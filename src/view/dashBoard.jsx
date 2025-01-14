@@ -23,7 +23,7 @@ import ImageIcon from "@mui/icons-material/Image";
 
 import { createFilterOptions } from "@mui/material/Autocomplete";
 
-const filter = createFilterOptions();
+const autocompleteFilter = createFilterOptions(); // R
 
 import CommentIcon from "@mui/icons-material/Comment";
 import {
@@ -39,7 +39,7 @@ import Sidebar from "../components/Sidebar";
 export default function Dashboard({ searchTerm }) {
   const [posts, setPosts] = useState([]);
   const [base64Image, setBase64Image] = useState("");
-  const [filter, setFilter] = useState("all");
+  const [filterType, setFilterType] = useState("all");
   const [value, setValue] = useState(null);
   const [coments, setComents] = useState([]);
   const [newComment, setNewComment] = useState({});
@@ -68,8 +68,8 @@ export default function Dashboard({ searchTerm }) {
     return hasTitulo || hasTipo;
   })
   .filter((post) => {
-    console.log("Filtro aplicado:", filter);
-    if (filter === "popular") {
+    console.log("Filtro aplicado:", filterType);
+    if (filterType  === "popular") {
       return post.likes >= 10; // Posts com 10 ou mais likes são considerados populares
     }
     return true;
@@ -259,9 +259,7 @@ export default function Dashboard({ searchTerm }) {
 
   return (
     <div style={{marginTop:"70px"}}>
-      <Sidebar setFilter={setFilter}/>
-
-
+      <Sidebar setFilter={setFilterType}/>
     <Box
       sx={{
         backgroundColor: "#1E252B",
@@ -450,7 +448,7 @@ export default function Dashboard({ searchTerm }) {
                     }
                   }}
                   filterOptions={(options, params) => {
-                    const filtered = filter(options, params);
+                    const filtered = autocompleteFilter(options, params);
 
                     const { inputValue } = params;
                     const isExisting = options.some(
@@ -666,82 +664,8 @@ export default function Dashboard({ searchTerm }) {
                         </IconButton>
                       </Button>
                     </Box>
-                    <IconButton
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleComments(post.idpost);
-                      }}
-                    >
-                      <CommentIcon sx={{ color: "#FFF" }} />
-                    </IconButton>
                   </Box>
                 </Box>
-                {openComments[post.idpost] && (
-                  <Box
-                    sx={{
-                      marginTop: 2,
-                      backgroundColor: "#333",
-                      borderRadius: 2,
-                      padding: 2,
-                    }}
-                  >
-                    {coments[post.idpost]?.length > 0 ? (
-                      <ul style={{ padding: "0px" }}>
-                        {coments[post.idpost].map((comentario) => (
-                          <li
-                            style={{
-                              marginBottom: "15px",
-                              listStyle: "none",
-                              color: "white",
-                            }}
-                            key={comentario.idcomentario}
-                          >z 
-                            {comentario.usuario?.nome || "Usuário desconhecido"}
-                            : {comentario.conteudo}
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <Typography
-                        sx={{
-                          fontFamily: "Rubik, sans-serif",
-                          color: "#AAA",
-                        }}
-                      >
-                        Nenhum comentário.
-                      </Typography>
-                    )}
-
-                    <TextField
-                      placeholder="Escreva um comentário..."
-                      variant="outlined"
-                      fullWidth
-                      value={newComment[post.idpost] || ""}
-                      onChange={(e) =>
-                        setNewComment((prevState) => ({
-                          ...prevState,
-                          [post.idpost]: e.target.value,
-                        }))
-                      }
-                      sx={{
-                        marginTop: 1,
-                        backgroundColor: "#555",
-                        borderRadius: 1,
-                        input: { color: "#FFF" },
-                      }}
-                      onClick={(e) => e.stopPropagation()}
-                    />
-                    <Button
-                      onClick={(e) => {
-                      e.stopPropagation();
-                      handleCreateComment(post.idpost)}}
-                      variant="contained"
-                      sx={{ backgroundColor: "#FF6F00", marginTop: 1 }}
-                    >
-                      Publicar
-                    </Button>
-                  </Box>
-                )}
               </CardContent>
             </Card>
           ))}
