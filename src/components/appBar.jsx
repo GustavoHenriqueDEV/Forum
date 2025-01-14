@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useRef, forwardRef, useImperativeHandle } from "react";
+import PropTypes from "prop-types";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
@@ -10,11 +11,34 @@ import DialogContent from "@mui/material/DialogContent";
 import InputBase from "@mui/material/InputBase";
 import SearchIcon from "@mui/icons-material/Search";
 import DialogTitle from "@mui/material/DialogTitle";
-import AuthPage from "./AuthPage"; // Importe o componente de login aqui
+import Avatar from "@mui/material/Avatar";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import AuthPage from "./AuthPage"; // Componente de login
 
-export default function CustomAppBar() {
+const CustomAppBar = forwardRef(({ onSearch }, ref) => {
+  const [searchInput, setSearchInput] = useState("");
   const [open, setOpen] = useState(false); // Controle para abrir/fechar o modal
+  const [anchorEl, setAnchorEl] = useState(null); // Controle do menu do avatar
   const username = localStorage.getItem("username");
+
+  // Ref para o campo de busca
+  const searchInputRef = useRef(null);
+
+  // Expondo a função de foco para o pai via ref
+  useImperativeHandle(ref, () => ({
+    focusSearch() {
+      if (searchInputRef.current) {
+        searchInputRef.current.focus();
+      }
+    },
+  }));
+
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchInput(value);
+    onSearch(value); // Envia o valor atualizado para o componente pai
+  };
 
   const handleLogout = () => {
     localStorage.clear(); // Limpa o localStorage
@@ -29,13 +53,44 @@ export default function CustomAppBar() {
     setOpen(false); // Fecha o modal
   };
 
+  const handleAvatarClick = (event) => {
+    setAnchorEl(event.currentTarget); // Abre o menu
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null); // Fecha o menu
+  };
+
+  const getInitials = (name) => {
+    return name
+      .split(" ")
+      .map((word) => word[0])
+      .join("")
+      .toUpperCase();
+  };
+
   return (
     <AppBar
-      position="static"
-      sx={{ backgroundColor: "#262D34", padding: "0 16px", height: 70 }}
+      position="fixed"
+      sx={{
+        borderBottom: "1px solid #3e4142",
+        backgroundColor: "#262D34",
+        padding: "0 16px",
+        height: 70,
+      }}
     >
       <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
-        <Typography variant="h6" sx={{ fontWeight: "bold", color: "#FF6F00" }}>
+        <img
+          style={{ height: "90px", width: "90px" }}
+          src="..\src\assets\medical (1).png"
+          alt="Logo"
+          aria-label="Logo do site"
+        />
+        <Typography
+          variant="h6"
+          sx={{ fontWeight: "bold", color: "#f4b842" }}
+          aria-label="Título do site"
+        >
           UP THE FORUM!
         </Typography>
         <Box
@@ -59,7 +114,11 @@ export default function CustomAppBar() {
           >
             <SearchIcon sx={{ color: "#FFF" }} />
             <InputBase
-              placeholder="Type here to search..."
+              inputRef={searchInputRef} // Vincula o ref ao campo de busca
+              value={searchInput}
+              onChange={handleSearchChange}
+              placeholder="Digite aqui para buscar..."
+              aria-label="Campo de busca"
               sx={{
                 color: "#FFF",
                 marginLeft: 1,
@@ -73,21 +132,47 @@ export default function CustomAppBar() {
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           {username ? (
             <>
-              <Typography sx={{ color: "#FFF" }}>{username}</Typography>
-              <Button
-                sx={{ fontSize: 11, height: 25 }}
-                variant="contained"
-                color="blue"
-                onClick={handleLogout}
+              <Avatar
+                sx={{
+                  bgcolor: "#FF6F00",
+                  color: "#FFF",
+                  width: 36,
+                  height: 36,
+                  fontSize: "1rem",
+                  cursor: "pointer",
+                }}
+                onClick={handleAvatarClick}
+                aria-label="Abrir menu do usuário"
               >
-                Sair
-              </Button>
+                {getInitials(username)}
+              </Avatar>
+              <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={handleMenuClose}
+                aria-label="Menu do usuário"
+              >
+                <MenuItem onClick={handleLogout}>Sair</MenuItem>
+              </Menu>
             </>
           ) : (
             <Button
               variant="contained"
-              color="primary"
+              sx={{
+                background: "linear-gradient(45deg, #FF6F00, #FFA733)",
+                color: "#FFF",
+                padding: "8px 16px",
+                fontWeight: "bold",
+                borderRadius: "20px",
+                textTransform: "none",
+                boxShadow: "0 3px 5px rgba(0, 0, 0, 0.3)",
+                "&:hover": {
+                  background: "linear-gradient(45deg, #FFA733, #FF6F00)",
+                  boxShadow: "0 5px 10px rgba(0, 0, 0, 0.4)",
+                },
+              }}
               onClick={handleLoginOpen}
+              aria-label="Botão de login"
             >
               Logar
             </Button>
@@ -95,11 +180,16 @@ export default function CustomAppBar() {
         </Box>
       </Toolbar>
 
-      {/* Modal (Dialog) para login */}
       <Dialog open={open} onClose={handleLoginClose}>
-        <DialogTitle>{username ? "Você está logado!" : "Login"}</DialogTitle>
+        <DialogTitle>
+          {username ? "Você está logado!" : "Login"}
+        </DialogTitle>
         <DialogContent>
-          <AuthPage onClose={handleLoginClose} />
+          {username ? (
+            <Typography variant="body1">Bem-vindo, {username}!</Typography>
+          ) : (
+            <AuthPage onClose={handleLoginClose} />
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleLoginClose} color="primary">
@@ -109,4 +199,10 @@ export default function CustomAppBar() {
       </Dialog>
     </AppBar>
   );
-}
+});
+
+CustomAppBar.propTypes = {
+  onSearch: PropTypes.func.isRequired,
+};
+
+export default CustomAppBar;

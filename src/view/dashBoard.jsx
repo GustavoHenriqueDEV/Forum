@@ -11,6 +11,7 @@ import {
   Badge,
   Fab,
   Autocomplete,
+  Link,
 } from "@mui/material";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
@@ -18,6 +19,8 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import TextField from "@mui/material/TextField";
 import FavoriteIcon from "@mui/icons-material/Favorite";
+import ImageIcon from "@mui/icons-material/Image";
+
 import { createFilterOptions } from "@mui/material/Autocomplete";
 
 const filter = createFilterOptions();
@@ -31,10 +34,12 @@ import {
   incrementLikes,
 } from "../service/service";
 import { Navigate, useNavigate } from "react-router-dom";
+import Sidebar from "../components/Sidebar";
 
-export default function Dashboard() {
+export default function Dashboard({ searchTerm }) {
   const [posts, setPosts] = useState([]);
   const [base64Image, setBase64Image] = useState("");
+  const [filter, setFilter] = useState("all");
   const [value, setValue] = useState(null);
   const [coments, setComents] = useState([]);
   const [newComment, setNewComment] = useState({});
@@ -49,13 +54,28 @@ export default function Dashboard() {
     likes: 0,
     imagembase64: "",
     imagem: "",
+    data_criacao:"",
   });
 
   const navigate = useNavigate();
   const handlePostClick = (idpost) => {
     navigate(`/post/${idpost}`);
   };
-
+  // Filtra os posts com base no termo de pesquisa
+  const filteredPosts = posts.filter((post) => {
+    const hasTitulo = post.titulo && post.titulo.toLowerCase().includes(searchTerm.toLowerCase());
+    const hasTipo = post.tipo && post.tipo.toLowerCase().includes(searchTerm.toLowerCase());
+    return hasTitulo || hasTipo;
+  })
+  .filter((post) => {
+    console.log("Filtro aplicado:", filter);
+    if (filter === "popular") {
+      return post.likes >= 10; // Posts com 10 ou mais likes são considerados populares
+    }
+    return true;
+  });
+  
+  
   const handleLike = async (idpost) => {
     const idusuarioLocal = localStorage.getItem("idusuario");
     if (!idusuarioLocal) {
@@ -103,17 +123,31 @@ export default function Dashboard() {
     }
   };
 
-  useEffect(() => {
+  function formatToISO(dateString) {
+    if (!dateString) return null;
+    // Substitui o espaço entre a data e a hora por "T" e adiciona "Z" ao final.
+    return dateString.replace(' ', 'T') + 'Z';
+  }
+  
+
+  useEffect(() => { 
     const fetchPosts = async () => {
       try {
         const postsData = await getPosts();
-        setPosts(postsData);
+        console.log("Dados dos posts recebidos:", postsData);
+        // Formata a data para ISO
+        const formattedPosts = postsData.map(post => ({
+          ...post,
+          data_criacao: post.data_criacao ? formatToISO(post.data_criacao) : null,
+        }));
+
+        setPosts(formattedPosts); // Atualiza o estado com os posts formatados
       } catch (error) {
         console.error("Erro ao buscar posts:", error);
       }
     };
     fetchPosts();
-  }, []);
+}, []);
   const handleCreatePost = async () => {
     const idusuarioLocal = localStorage.getItem("idusuario");
     if (!idusuarioLocal) {
@@ -193,18 +227,16 @@ export default function Dashboard() {
       alert("Erro ao publicar comentário.");
     }
   };
-  const top100Films = [
-    { title: "The Shawshank Redemption", year: 1994 },
-    { title: "The Godfather", year: 1972 },
-    { title: "The Godfather: Part II", year: 1974 },
-    { title: "The Dark Knight", year: 2008 },
-    { title: "12 Angry Men", year: 1957 },
-    { title: "Schindler's List", year: 1993 },
-    { title: "Pulp Fiction", year: 1994 },
-    {
-      title: "The Lord of the Rings: The Return of the King",
-      year: 2003,
-    },
+  const options = [
+    { title: "Notícias", },
+    { title: "Artigos", },
+    { title: "Tutoriais"},
+    { title: "Opinião"},
+    { title: "Revisão/Review" },
+    { title: "Análise" },
+    { title: "Lista/Ranking"},
+    { title: "Guia rápido"},
+    { title: "Dicas"},  
   ];
 
   const [open, setOpen] = useState(false);
@@ -226,6 +258,10 @@ export default function Dashboard() {
   };
 
   return (
+    <div style={{marginTop:"70px"}}>
+      <Sidebar setFilter={setFilter}/>
+
+
     <Box
       sx={{
         backgroundColor: "#1E252B",
@@ -265,7 +301,7 @@ export default function Dashboard() {
                 <Typography
                   sx={{ fontFamily: "Rubik, sans-serif", color: "#FFF" }}
                 >
-                  Share what's on your mind...
+                  Compartilhe oque está pensando...
                 </Typography>
               </Box>
               <Button
@@ -370,15 +406,34 @@ export default function Dashboard() {
                   }
                   variant="outlined"
                 />
-                <Button variant="contained" component="label">
-                  Escolher Imagem para converter
-                  <input
-                    type="file"
-                    accept="image/*"
-                    hidden
-                    onChange={handleImageChange}
-                  />
-                </Button>
+                 <Button
+                    sx={{
+                      mt: "10px",
+                      mb: "20px",
+                      textTransform: "none",
+                      padding: "10px 20px",
+                      display: "flex",
+                      alignItems: "center",
+                      backgroundColor: "#1976d2",
+                      color: "#ffffff",
+                      "&:hover": {
+                        backgroundColor: "#1565c0",
+                      },
+                      borderRadius: "8px",
+                      boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                    }}
+                    variant="contained"
+                    component="label"
+                  >
+                <ImageIcon sx={{ mr: "8px" }} /> {/* Ícone de imagem com margem direita */}
+                Escolher Imagem
+                <input
+                  type="file"
+                  accept="image/*"
+                  hidden
+                  onChange={handleImageChange}
+                />
+               </Button>
                 <Autocomplete
                   value={value}
                   onChange={(event, newValue) => {
@@ -414,7 +469,7 @@ export default function Dashboard() {
                   clearOnBlur
                   handleHomeEndKeys
                   id="free-solo-with-text-demo"
-                  options={top100Films}
+                  options={options}
                   getOptionLabel={(option) => {
                     if (typeof option === "string") {
                       return option;
@@ -472,13 +527,12 @@ export default function Dashboard() {
               </DialogActions>
             </Dialog>
           </Box>
-          {posts.map((post) => (
+          {(filteredPosts.length > 0 ? filteredPosts : posts).map((post) => (
             <Card
               onClick={() => handlePostClick(post.idpost)}
               key={post.idpost}
               sx={{
                 fontFamily: "Rubik, sans-serif",
-
                 backgroundColor: "#262D34",
                 borderRadius: 4,
                 marginBottom: 2,
@@ -488,43 +542,52 @@ export default function Dashboard() {
                 <Box
                   sx={{
                     fontFamily: "Rubik, sans-serif",
-                    display: "flex",
                     justifyContent: "",
                   }}
                 >
-
-                <Typography
+                  <Typography
                     sx={{
-                      display:"flex",
+                      display: "flex",
                       fontFamily: "Rubik, sans-serif",
                       color: "#FFF",
                       fontSize: "13px",
                       fontWeight: "bold",
                     }}
-                  > 
-                  <Avatar sx={{   width:"23px", height:"23px",  marginRight: 1 }} />
-
-                  {post.nome}
+                  >
+                    <Avatar
+                      sx={{ width: "23px", height: "23px", marginRight: 1 }}
+                    />
+                    {post.nome} • 
+                    
+                    <Typography sx={{ color:"#8ba2ad", mt:"2px", ml:"3px", fontSize:"11px"}}  >
+                    {post.data_criacao 
+                        ? new Date(post.data_criacao).toLocaleDateString("pt-BR", {
+                            day: "2-digit",
+                            month: "2-digit",
+                            year: "numeric",
+                          })
+                        : "Data inválida"}
+                    </Typography>
+                    
                   </Typography>
                   <Typography
                     sx={{
                       fontFamily: "Rubik, sans-serif",
-                      color: "#FFF",
-                      fontSize: "20px",
+                      color: "#8ba2ad",
+                      fontSize: "15px",
+                      mt:"6px",
                       fontWeight: "bold",
-                      ml:"282px",
-                      mb:"10px",
+                      mb: "10px",
                     }}
-                  > 
+                  >
                     {post.titulo}
                   </Typography>
-                  
                 </Box>
                 <Box
-                    sx={{
-                      borderBottom: "3px solid #444", // Estilo da linha
-                    }}
-                  />
+                  sx={{
+                    borderBottom: "3px solid #444", // Estilo da linha
+                  }}
+                />
                 <Box
                   sx={{
                     fontFamily: "Rubik, sans-serif",
@@ -534,8 +597,6 @@ export default function Dashboard() {
                     gap: 2,
                   }}
                 >
-                 
-
                   <Box
                     sx={{
                       fontFamily: "Rubik, sans-serif",
@@ -559,25 +620,24 @@ export default function Dashboard() {
                     />
                   </Box>
                 </Box>
-                <Box>                   
-                    <Fab
-                      sx={{
-                        fontFamily: "Rubik, sans-serif",
-                        fontSize: "12px",
-                        mt: "3px",
-                        mr: "5px",
-                        height:"35px"
-                      }}
-                      variant="extended"
-                    >
-                      {post.tipo}
-                    </Fab>
-                  </Box>
+                <Box>
+                  <Fab
+                    sx={{
+                      fontFamily: "Rubik, sans-serif",
+                      fontSize: "12px",
+                      mt: "3px",
+                      mr: "5px",
+                      height: "35px",
+                    }}
+                    variant="extended"
+                  >
+                    {post.tipo}
+                  </Fab>
+                </Box>
 
                 <Box
                   sx={{
                     fontFamily: "Rubik, sans-serif",
-
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
@@ -592,27 +652,30 @@ export default function Dashboard() {
                       gap: 2,
                     }}
                   >
-                    <Box > 
-                  <Button onClick={(e) => { 
-                    e.stopPropagation();
-                    handleLike(post.idpost)
-                    }}>
-                    <IconButton   >
-                      <Badge badgeContent={post.likes} color="error">
-                        <FavoriteIcon sx={{  color: "white" }} />
-                      </Badge>
-                    </IconButton>
-                  </Button>    
-                  </Box>
-                    <IconButton onClick={(e) => {
-                      e.stopPropagation();
-                      toggleComments(post.idpost)
-                    }}>
+                    <Box>
+                      <Button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleLike(post.idpost);
+                        }}
+                      >
+                        <IconButton>
+                          <Badge badgeContent={post.likes} color="error">
+                            <FavoriteIcon sx={{ color: "white" }} />
+                          </Badge>
+                        </IconButton>
+                      </Button>
+                    </Box>
+                    <IconButton
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleComments(post.idpost);
+                      }}
+                    >
                       <CommentIcon sx={{ color: "#FFF" }} />
                     </IconButton>
                   </Box>
                 </Box>
-
                 {openComments[post.idpost] && (
                   <Box
                     sx={{
@@ -685,5 +748,7 @@ export default function Dashboard() {
         </Grid>
       </Grid>
     </Box>
+    
+    </div>
   );
 }

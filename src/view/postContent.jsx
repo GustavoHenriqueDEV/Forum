@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { getPostById, getComentariosByPost, createComentario } from "../service/service";
 import FavoriteIcon from "@mui/icons-material/Favorite";
-
+import CommentIcon from "@mui/icons-material/Comment";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import Sidebar from "../components/Sidebar";
 import {
   Box,
   Typography,
@@ -11,11 +13,13 @@ import {
   CircularProgress,
   Paper,
   IconButton,
-  Badge, 
+  Badge,
+  Avatar,
 } from "@mui/material";
 
 export default function PostContent() {
   const { idpost } = useParams();
+  const navigate = useNavigate();
   const [post, setPost] = useState(null);
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -104,134 +108,163 @@ export default function PostContent() {
   }
 
   return (
-    <Box
-      p={3}
-      maxWidth={800}
-      mx="auto"
-      bgcolor="#2A2F38"
-      boxShadow={3}
-      borderRadius={2}
-      color="#FFF"
+    <div
+      style={{
+        display: "flex",
+        paddingTop: "64px",
+        minHeight: "100vh",
+        width: "100%",
+        backgroundColor: "#17202a",
+      }}
     >
-      <Typography
-        sx={{
-          fontFamily: "Rubik, sans-serif",
+    <div style={{ zIndex: 1000, overflow: "hidden", backgroundColor: "#17202a" }}>
+  <Sidebar />
+</div>
 
-        }}
-        variant="h4"
-        gutterBottom
-        textAlign="center"
-        style={{ color: "#00D1B2" }}
+      <Box
+        p={3}
+        maxWidth={800}
+        mx="auto"
+        bgcolor="#2A2F38"
+        boxShadow={3}
+        borderRadius={2}
+        color="#FFF"
+        
+        sx={{ width: "80%" }} // Estilo para o MainContent
       >
-        {post.titulo || "Sem título"}
-      </Typography>
-      <Typography
-        sx={{
-          fontFamily: "Rubik, sans-serif",
+        <Typography
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            marginBottom: 2,
+          }}
+        >
+          <IconButton sx={{ mr: "4px", color: "#FFF" }} onClick={() => navigate("/")}>
+            <ArrowBackIcon />
+          </IconButton>
+          <Avatar sx={{ width: "23px", height: "23px", marginRight: 1 }} />
+          {post.usuario.nome || "erro"}
+        </Typography>
 
-        }}
-        variant="body1"
-        gutterBottom
-        style={{ color: "#D4D4D4", textAlign: "justify" }}
-      >
-        {post.conteudo || "Conteúdo indisponível"}
-      </Typography>
-      {post.imagembase64 && (
-        <Box
-          component="img"
-          src={`data:image/png;base64,${post.imagembase64}`}
-          alt={post.titulo || "Imagem do post"}
-          width="100%"
-          maxHeight={400}
-          borderRadius={2}
-          mb={2}
-          sx={{ objectFit: "cover", border: "2px solid #444" }}
-        />
-      )}
+        <Typography
+          sx={{
+            fontFamily: "Rubik, sans-serif",
+          }}
+          variant="body1"
+          gutterBottom
+          fontSize={20}
+          style={{ color: "#F2F4F5", textAlign: "justify" }}
+        >
+          {post.titulo || "Conteúdo indisponível"}
+        </Typography>
 
-<Button onClick={(e) => { 
-                    e.stopPropagation();
-                    handleLike(post.idpost)
-                    }}>
-                    <IconButton   >
-                      <Badge badgeContent={post.likes} color="error">
-                        <FavoriteIcon sx={{  color: "white" }} />
-                      </Badge>
-                    </IconButton>
-                  </Button>   
-      <Typography variant="subtitle1" style={{ color: "#00D1B2" }}>
-      </Typography>
-      <Button
-        variant="contained"
-        style={{
-          backgroundColor: "#00D1B2",
-          color: "#FFF",
-          marginTop: "20px",
-        }}
-        onClick={handleToggleComments}
-      >
-        {openComments ? "Ocultar Comentários" : "Mostrar Comentários"}
-      </Button>
+        <Typography
+          letterSpacing={1}
+          fontSize={14}
+          variant="body1"
+          gutterBottom
+          style={{ color: "#B8C5C9", textAlign: "justify" }}
+        >
+          {post.conteudo || "Conteúdo indisponível"}
+        </Typography>
+        {post.imagembase64 && (
+          <Box
+            component="img"
+            src={`data:image/png;base64,${post.imagembase64}`}
+            alt={post.titulo || "Imagem do post"}
+            width="100%"
+            maxHeight={400}
+            borderRadius={2}
+            mb={2}
+            sx={{ objectFit: "cover", border: "2px solid #444" }}
+          />
+        )}
+        <Box sx={{ borderBottom: "3px solid #444" }} />
 
-      {openComments && (
-        <Box mt={4} bgcolor="#1E252B" p={3} borderRadius={2}>
-          <Typography variant="h5" style={{ color: "#00D1B2" }} gutterBottom>
-            Comentários
-          </Typography>
-          {comments.length > 0 ? (
-            comments.map((comment) => (
-              <Paper
-                key={comment.id}
-                elevation={2}
+        <Button onClick={(e) => e.stopPropagation()}>
+          <IconButton>
+            <Badge badgeContent={post.likes} color="error">
+              <FavoriteIcon sx={{ color: "white" }} />
+            </Badge>
+          </IconButton>
+        </Button>
+
+        <Button
+          variant="contained"
+          style={{
+            backgroundColor: "#00D1B2",
+            color: "#FFF",
+            marginTop: "20px",
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+          }}
+          onClick={handleToggleComments}
+        >
+          <CommentIcon sx={{ color: "#FFF" }} />
+          {openComments ? "Ocultar Comentários" : "Mostrar Comentários"}
+        </Button>
+
+        {openComments && (
+          <Box mt={4} bgcolor="#1E252B" p={3} borderRadius={2}>
+            <Typography variant="h5" style={{ color: "#00D1B2" }} gutterBottom>
+              Comentários
+            </Typography>
+            {comments.length > 0 ? (
+              comments.map((comment) => (
+                <Paper
+                  key={comment.id}
+                  elevation={2}
+                  style={{
+                    backgroundColor: "#2A2F38",
+                    padding: "15px",
+                    marginBottom: "15px",
+                    borderRadius: "8px",
+                  }}
+                >
+                  <Typography style={{ color: "#FFF", fontWeight: "bold" }}>
+                    {comment.usuario?.nome || "Anônimo"}:
+                  </Typography>
+                  <Typography style={{ color: "#D4D4D4" }}>
+                    {comment.conteudo || "Sem conteúdo"}
+                  </Typography>
+                </Paper>
+              ))
+            ) : (
+              <Typography style={{ color: "#D4D4D4", fontStyle: "italic" }}>
+                Nenhum comentário ainda.
+              </Typography>
+            )}
+            <Box mt={2} display="flex" gap={2}>
+              <TextField
+                fullWidth
+                variant="outlined"
+                placeholder="Escreva um comentário..."
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
                 style={{
                   backgroundColor: "#2A2F38",
-                  padding: "15px",
-                  marginBottom: "15px",
+                  color: "#FFF",
                   borderRadius: "8px",
                 }}
+                InputProps={{
+                  style: { color: "#FFF" },
+                }}
+              />
+              <Button
+                variant="contained"
+                style={{
+                  backgroundColor: "#00D1B2",
+                  color: "#FFF",
+                }}
+                onClick={handleCreateComment}
               >
-                <Typography style={{ color: "#FFF", fontWeight: "bold" }}>
-                  {comment.usuario?.nome || "Anônimo"}:
-                </Typography>
-                <Typography style={{ color: "#D4D4D4" }}>
-                  {comment.conteudo || "Sem conteúdo"}
-                </Typography>
-              </Paper>
-            ))
-          ) : (
-            <Typography style={{ color: "#D4D4D4", fontStyle: "italic" }}>
-              Nenhum comentário ainda.
-            </Typography>
-          )}
-          <Box mt={2} display="flex" gap={2}>
-            <TextField
-              fullWidth
-              variant="outlined"
-              placeholder="Escreva um comentário..."
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-              style={{
-                backgroundColor: "#2A2F38",
-                color: "#FFF",
-                borderRadius: "8px",
-              }}
-              InputProps={{
-                style: { color: "#FFF" },
-              }}
-            />
-            <Button
-              variant="contained"
-              style={{
-                backgroundColor: "#00D1B2",
-                color: "#FFF",
-              }}
-              onClick={handleCreateComment}
-            >
-              Publicar
-            </Button>
+                Publicar
+              </Button>
+            </Box>
           </Box>
-        </Box>
-      )}
-    </Box>
+        )}
+      </Box>
+    </div>
   );
 }
