@@ -33,17 +33,17 @@ export default function AuthPage({ onClose }) {
         console.log("Resposta da API:", response.data);
         localStorage.clear();
         localStorage.setItem("idusuario", response.data.idusuario);
-        localStorage.setItem("username", response.data.nome); // Salva o nome do usuário
+        localStorage.setItem("username", response.data.nome); 
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('role', response.data.role)
         console.log(response.data.token);
         console.log(response.data.role);
 
         alert("Login realizado com sucesso!");
-        onClose(); // Fecha o pop-up após o login
+        onClose();
       } else {
         alert("Usuário registrado com sucesso!");
-        setIsLogin(true); // Alterar para tela de login após registro
+        setIsLogin(true); 
       }
     } catch (error) {
       console.error("Erro:", error);
@@ -56,10 +56,10 @@ export default function AuthPage({ onClose }) {
       maxWidth="xs"
       sx={{
         padding: 3,
-        backgroundColor: "#3A3F47", // Fundo escuro similar ao dashboard
+        backgroundColor: "#3A3F47", 
         borderRadius: 2,
         boxShadow: 3,
-        backdropFilter: "blur(10px)", // Para dar um efeito sutil de desfoque no fundo
+        backdropFilter: "blur(10px)", 
       }}
     >
       <Box>
@@ -67,7 +67,7 @@ export default function AuthPage({ onClose }) {
           variant="h4"
           align="center"
           gutterBottom
-          sx={{ color: "#FF6F00", fontWeight: "bold" }} // Cor laranja para o título
+          sx={{ color: "#FF6F00", fontWeight: "bold" }}
         >
           {isLogin ? "Login" : "Registrar"}
         </Typography>
@@ -83,7 +83,7 @@ export default function AuthPage({ onClose }) {
             margin="normal"
             required
             sx={{
-              backgroundColor: "#2A2F36", // Cor de fundo dos campos de entrada
+              backgroundColor: "#2A2F36", 
               borderRadius: "4px",
               color: "#FFF",
             }}
@@ -98,7 +98,7 @@ export default function AuthPage({ onClose }) {
             margin="normal"
             required
             sx={{
-              backgroundColor: "#2A2F36", // Cor de fundo dos campos de entrada
+              backgroundColor: "#2A2F36", 
               borderRadius: "4px",
               color: "#FFF",
             }}
@@ -116,7 +116,7 @@ export default function AuthPage({ onClose }) {
                 margin="normal"
                 required
                 sx={{
-                  backgroundColor: "#2A2F36", // Cor de fundo dos campos de entrada
+                  backgroundColor: "#2A2F36", 
                   borderRadius: "4px",
                   color: "#FFF",
                 }}
@@ -131,7 +131,7 @@ export default function AuthPage({ onClose }) {
                 margin="normal"
                 required
                 sx={{
-                  backgroundColor: "#2A2F36", // Cor de fundo dos campos de entrada
+                  backgroundColor: "#2A2F36", 
                   borderRadius: "4px",
                   color: "#FFF",
                 }}
@@ -146,9 +146,9 @@ export default function AuthPage({ onClose }) {
             fullWidth
             sx={{
               marginTop: 2,
-              backgroundColor: "#FF6F00", // Cor de fundo do botão (laranja)
+              backgroundColor: "#FF6F00", 
               "&:hover": {
-                backgroundColor: "#E65100", // Cor de hover para o botão
+                backgroundColor: "#E65100", 
               },
             }}
           >
@@ -161,7 +161,7 @@ export default function AuthPage({ onClose }) {
             href="#"
             onClick={() => setIsLogin(!isLogin)}
             variant="body2"
-            sx={{ color: "#FF6F00" }} // Cor laranja para o link
+            sx={{ color: "#FF6F00" }}
           >
             {isLogin
               ? "Não tem uma conta? Registrar"

@@ -18,7 +18,7 @@ export default function Sidebar({ setFilter }) {
         left: 0,
         top: "70px",
         width: "240px",
-        height: "calc(100vh - 64px)", // Altura ajustada
+        height: "calc(100vh - 64px)", 
         borderRight: "1px solid #3e4142",
         backgroundColor: "#1e252b",
         color: "#d7dadc",
@@ -28,7 +28,6 @@ export default function Sidebar({ setFilter }) {
       }}
     >
       <List>
-        {/* Item "Popular" com animação de hover */}
         <ListItem
           button
           onClick={() => setFilter("popular")}
@@ -36,7 +35,7 @@ export default function Sidebar({ setFilter }) {
             transition: "transform 0.3s, background-color 0.3s",
             "&:hover": {
               transform: "scale(1.05)",
-              backgroundColor: "#333", // Cor de fundo ao passar o mouse
+              backgroundColor: "#333", 
             },
           }}
         >
@@ -46,7 +45,6 @@ export default function Sidebar({ setFilter }) {
           <ListItemText primary="Popular" />
         </ListItem>
         <Divider sx={{ marginY: "20px", borderColor: "#2a2a2c" }} />
-        {/* Item "Tudo" com animação de hover */}
         <ListItem
           button
           onClick={() => setFilter("all")}
@@ -54,7 +52,7 @@ export default function Sidebar({ setFilter }) {
             transition: "transform 0.3s, background-color 0.3s",
             "&:hover": {
               transform: "scale(1.05)",
-              backgroundColor: "#333", // Cor de fundo ao passar o mouse
+              backgroundColor: "#333", 
             },
           }}
         >

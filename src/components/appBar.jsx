@@ -14,18 +14,16 @@ import DialogTitle from "@mui/material/DialogTitle";
 import Avatar from "@mui/material/Avatar";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-import AuthPage from "./AuthPage"; // Componente de login
+import AuthPage from "./AuthPage"; 
 
 const CustomAppBar = forwardRef(({ onSearch }, ref) => {
   const [searchInput, setSearchInput] = useState("");
-  const [open, setOpen] = useState(false); // Controle para abrir/fechar o modal
-  const [anchorEl, setAnchorEl] = useState(null); // Controle do menu do avatar
+  const [open, setOpen] = useState(false); 
+  const [anchorEl, setAnchorEl] = useState(null); 
   const username = localStorage.getItem("username");
 
-  // Ref para o campo de busca
   const searchInputRef = useRef(null);
 
-  // Expondo a função de foco para o pai via ref
   useImperativeHandle(ref, () => ({
     focusSearch() {
       if (searchInputRef.current) {
@@ -37,28 +35,28 @@ const CustomAppBar = forwardRef(({ onSearch }, ref) => {
   const handleSearchChange = (e) => {
     const value = e.target.value;
     setSearchInput(value);
-    onSearch(value); // Envia o valor atualizado para o componente pai
+    onSearch(value); 
   };
 
   const handleLogout = () => {
-    localStorage.clear(); // Limpa o localStorage
-    window.location.reload(); // Recarrega a página
+    localStorage.clear(); 
+    window.location.reload(); 
   };
 
   const handleLoginOpen = () => {
-    setOpen(true); // Abre o modal
+    setOpen(true);
   };
 
   const handleLoginClose = () => {
-    setOpen(false); // Fecha o modal
+    setOpen(false); 
   };
 
   const handleAvatarClick = (event) => {
-    setAnchorEl(event.currentTarget); // Abre o menu
+    setAnchorEl(event.currentTarget); 
   };
 
   const handleMenuClose = () => {
-    setAnchorEl(null); // Fecha o menu
+    setAnchorEl(null); 
   };
 
   const getInitials = (name) => {
@@ -114,7 +112,7 @@ const CustomAppBar = forwardRef(({ onSearch }, ref) => {
           >
             <SearchIcon sx={{ color: "#FFF" }} />
             <InputBase
-              inputRef={searchInputRef} // Vincula o ref ao campo de busca
+              inputRef={searchInputRef} 
               value={searchInput}
               onChange={handleSearchChange}
               placeholder="Digite aqui para buscar..."

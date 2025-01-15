@@ -28,24 +28,12 @@ import {
 export default function PostContent() {
   const { idpost } = useParams();
   const navigate = useNavigate();
-
-  // Estado do post
   const [post, setPost] = useState(null);
-
-  // Estado dos comentários
   const [comments, setComments] = useState([]);
-
-  // Estado de loading e error
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  // Estado para novo comentário
   const [newComment, setNewComment] = useState("");
-
-  // Controle de exibição dos comentários
   const [openComments, setOpenComments] = useState(false);
-
-  // ---------------- NOVOS ESTADOS PARA RESPOSTAS ----------------
   const [respostasPorComentario, setRespostasPorComentario] = useState({});
 
   useEffect(() => {
@@ -58,7 +46,6 @@ export default function PostContent() {
         const commentsData = await getComentariosByPost(idpost);
         setComments(commentsData);
 
-        // Inicializando o objeto de respostas
         const inicial = {};
         commentsData.forEach((comment) => {
           inicial[comment.idcomentario] = {
@@ -79,12 +66,10 @@ export default function PostContent() {
     fetchData();
   }, [idpost]);
 
-  // Toggle para abrir/fechar a lista de comentários
   const handleToggleComments = () => {
     setOpenComments(!openComments);
   };
 
-  // Cria um comentário
   const handleCreateComment = async () => {
     const idusuarioLocal = localStorage.getItem("idusuario");
     if (!idusuarioLocal) {
@@ -98,14 +83,11 @@ export default function PostContent() {
         usuario: { idusuario: parseInt(idusuarioLocal) },
       };
   
-      // Cria o comentário no back-end
       await createComentario(idpost, comentario);
   
-      // Agora, em vez de só inserir no estado, REFAZ a busca de todos os comentários
       const updatedComments = await getComentariosByPost(idpost);
       setComments(updatedComments);
   
-      // Também atualiza o objeto de respostasPorComentario
       const inicial = {};
       updatedComments.forEach((comment) => {
         inicial[comment.idcomentario] = {
@@ -116,7 +98,6 @@ export default function PostContent() {
       });
       setRespostasPorComentario(inicial);
   
-      // Limpa o campo
       setNewComment("");
     } catch (error) {
       console.error("Erro ao criar comentário:", error);
@@ -124,13 +105,10 @@ export default function PostContent() {
     }
   };
 
-  // ---------------- MANIPULAÇÃO DE RESPOSTAS ----------------
 
-  // Handle para exibir/ocultar respostas de um comentário
   const handleToggleRespostas = async (idcomentario) => {
     const jaAberto = respostasPorComentario[idcomentario]?.aberto;
 
-    // Se não estiver aberto, ao abrir, buscamos as respostas no servidor
     if (!jaAberto) {
       try {
         const respostas = await getRespostasByComentario(idcomentario);
@@ -146,7 +124,6 @@ export default function PostContent() {
         console.error("Erro ao buscar respostas:", error);
       }
     } else {
-      // Se já estiver aberto, apenas ocultamos
       setRespostasPorComentario((prev) => ({
         ...prev,
         [idcomentario]: {
@@ -157,7 +134,6 @@ export default function PostContent() {
     }
   };
 
-  // Atualiza o campo de nova resposta
   const handleChangeNovaResposta = (idcomentario, valor) => {
     setRespostasPorComentario((prev) => ({
       ...prev,
@@ -168,8 +144,6 @@ export default function PostContent() {
     }));
   };
 
-  // Cria uma nova resposta para um comentário
-  // ...
 const handleCreateResposta = async (idcomentario) => {
   const idusuarioLocal = localStorage.getItem("idusuario");
   if (!idusuarioLocal) {
@@ -178,21 +152,18 @@ const handleCreateResposta = async (idcomentario) => {
   }
 
   try {
-    // Mude aqui:
     const respostaBody = {
       conteudo: respostasPorComentario[idcomentario].novaResposta,
       idUsuario: parseInt(idusuarioLocal),
     };
 
     const createdResposta = await createResposta(idcomentario, respostaBody);
-
-    // Atualiza o estado para incluir a nova resposta
     setRespostasPorComentario((prev) => ({
       ...prev,
       [idcomentario]: {
         ...prev[idcomentario],
         respostas: [...prev[idcomentario].respostas, createdResposta],
-        novaResposta: "", // limpa o campo
+        novaResposta: "", 
       },
     }));
   } catch (error) {
@@ -202,7 +173,6 @@ const handleCreateResposta = async (idcomentario) => {
 };
 
 
-  // ---------------- RENDERIZAÇÃO PRINCIPAL ----------------
 
   if (loading) {
     return (
@@ -249,12 +219,10 @@ const handleCreateResposta = async (idcomentario) => {
         backgroundColor: "#17202a",
       }}
     >
-      {/* SIDEBAR */}
       <div style={{ zIndex: 1000, overflow: "hidden", backgroundColor: "#17202a" }}>
         <Sidebar />
       </div>
 
-      {/* CONTEÚDO PRINCIPAL DO POST */}
       <Box
         p={3}
         maxWidth={800}
@@ -265,7 +233,6 @@ const handleCreateResposta = async (idcomentario) => {
         color="#FFF"
         sx={{ height:"90%", width: "70%" }}
       >
-        {/* TÍTULO E AVATAR */}
         <Typography
           sx={{
             display: "flex",
@@ -280,7 +247,6 @@ const handleCreateResposta = async (idcomentario) => {
           {post.usuario.nome || "erro"}
         </Typography>
 
-        {/* TÍTULO DO POST */}
         <Typography
           sx={{
             fontFamily: "Rubik, sans-serif",
@@ -293,7 +259,6 @@ const handleCreateResposta = async (idcomentario) => {
           {post.titulo || "Conteúdo indisponível"}
         </Typography>
 
-        {/* CONTEÚDO DO POST */}
         <Typography
           letterSpacing={1}
           fontSize={14}
@@ -304,7 +269,6 @@ const handleCreateResposta = async (idcomentario) => {
           {post.conteudo || "Conteúdo indisponível"}
         </Typography>
 
-        {/* IMAGEM DO POST */}
         {post.imagembase64 && (
           <Box
             component="img"
@@ -321,7 +285,6 @@ const handleCreateResposta = async (idcomentario) => {
 
        
 
-        {/* BOTÃO MOSTRAR/OCULTAR COMENTÁRIOS */}
         <Button
           variant="contained"
           style={{
@@ -338,7 +301,6 @@ const handleCreateResposta = async (idcomentario) => {
           {openComments ? "Ocultar Comentários" : "Mostrar Comentários"}
         </Button>
 
-        {/* SEÇÃO DE COMENTÁRIOS */}
         <Collapse in={openComments} timeout="auto" unmountOnExit>
           <Box mt={4} bgcolor="#1E252B" p={3} borderRadius={2}>
             <Typography variant="h5" style={{ color: "#00D1B2" }} gutterBottom>
@@ -356,17 +318,14 @@ const handleCreateResposta = async (idcomentario) => {
                     borderRadius: "8px",
                   }}
                 >
-                  {/* Nome do usuário */}
                   <Typography style={{ color: "#FFF", fontWeight: "bold" }}>
                     {comment.usuario?.nome || "Anônimo"}:
                   </Typography>
 
-                  {/* Conteúdo do comentário */}
                   <Typography style={{ color: "#D4D4D4", marginBottom: 8 }}>
                     {comment.conteudo || "Sem conteúdo"}
                   </Typography>
 
-                  {/* BOTÃO DE VER RESPOSTAS */}
                   <Button
                     size="small"
                     variant="outlined"
@@ -378,7 +337,6 @@ const handleCreateResposta = async (idcomentario) => {
                       : "Ver Respostas"}
                   </Button>
 
-                  {/* SEÇÃO DE RESPOSTAS (EXIBIDA SE ABERTO) */}
                   <Collapse
                     in={respostasPorComentario[comment.idcomentario]?.aberto}
                     timeout="auto"
@@ -417,7 +375,6 @@ const handleCreateResposta = async (idcomentario) => {
                         </Typography>
                       )}
 
-                      {/* CAMPO PARA NOVA RESPOSTA */}
                       <Box mt={2} display="flex" gap={2}>
                         <TextField
                           fullWidth
@@ -459,7 +416,6 @@ const handleCreateResposta = async (idcomentario) => {
               </Typography>
             )}
 
-            {/* CAMPO PARA NOVO COMENTÁRIO GERAL */}
             <Box mt={2} display="flex" gap={2}>
               <TextField
                 fullWidth
