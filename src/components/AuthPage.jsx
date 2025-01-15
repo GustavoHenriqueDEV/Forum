@@ -34,6 +34,10 @@ export default function AuthPage({ onClose }) {
         localStorage.clear();
         localStorage.setItem("idusuario", response.data.idusuario);
         localStorage.setItem("username", response.data.nome); // Salva o nome do usuário
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('role', response.data.role)
+        console.log(response.data.token);
+        console.log(response.data.role);
 
         alert("Login realizado com sucesso!");
         onClose(); // Fecha o pop-up após o login

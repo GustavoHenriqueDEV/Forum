@@ -91,28 +91,31 @@ export default function PostContent() {
       alert("Usuário não autenticado!");
       return;
     }
-
+  
     try {
       const comentario = {
         conteudo: newComment,
         usuario: { idusuario: parseInt(idusuarioLocal) },
       };
-
-      const createdComment = await createComentario(idpost, comentario);
-
-      // Adiciona novo comentário ao estado
-      setComments((prevComments) => [...prevComments, createdComment]);
-
-      // Inicializa a entrada no objeto de respostas
-      setRespostasPorComentario((prevState) => ({
-        ...prevState,
-        [createdComment.idcomentario]: {
+  
+      // Cria o comentário no back-end
+      await createComentario(idpost, comentario);
+  
+      // Agora, em vez de só inserir no estado, REFAZ a busca de todos os comentários
+      const updatedComments = await getComentariosByPost(idpost);
+      setComments(updatedComments);
+  
+      // Também atualiza o objeto de respostasPorComentario
+      const inicial = {};
+      updatedComments.forEach((comment) => {
+        inicial[comment.idcomentario] = {
           respostas: [],
           aberto: false,
           novaResposta: "",
-        },
-      }));
-
+        };
+      });
+      setRespostasPorComentario(inicial);
+  
       // Limpa o campo
       setNewComment("");
     } catch (error) {
