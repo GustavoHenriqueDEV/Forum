@@ -1,4 +1,9 @@
-import React, { useState, useRef, forwardRef, useImperativeHandle } from "react";
+import React, {
+  useState,
+  useRef,
+  forwardRef,
+  useImperativeHandle,
+} from "react";
 import PropTypes from "prop-types";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
@@ -14,34 +19,26 @@ import DialogTitle from "@mui/material/DialogTitle";
 import Avatar from "@mui/material/Avatar";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-import AuthPage from "./AuthPage"; 
+import AuthPage from "./AuthPage";
 import { useNavigate } from "react-router-dom";
 
 const CustomAppBar = forwardRef(({ onSearch }, ref) => {
   const [searchInput, setSearchInput] = useState("");
-  const [open, setOpen] = useState(false); 
-  const [anchorEl, setAnchorEl] = useState(null); 
+  const [open, setOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
   const username = localStorage.getItem("username");
 
   const searchInputRef = useRef(null);
 
-  useImperativeHandle(ref, () => ({
-    focusSearch() {
-      if (searchInputRef.current) {
-        searchInputRef.current.focus();
-      }
-    },
-  }));
-
   const handleSearchChange = (e) => {
     const value = e.target.value;
     setSearchInput(value);
-    onSearch(value); 
+    onSearch(value);
   };
 
   const handleLogout = () => {
-    localStorage.clear(); 
-    window.location.reload(); 
+    localStorage.clear();
+    window.location.reload();
   };
 
   const handleLoginOpen = () => {
@@ -49,15 +46,15 @@ const CustomAppBar = forwardRef(({ onSearch }, ref) => {
   };
 
   const handleLoginClose = () => {
-    setOpen(false); 
+    setOpen(false);
   };
 
   const handleAvatarClick = (event) => {
-    setAnchorEl(event.currentTarget); 
+    setAnchorEl(event.currentTarget);
   };
 
   const handleMenuClose = () => {
-    setAnchorEl(null); 
+    setAnchorEl(null);
   };
 
   const getInitials = (name) => {
@@ -113,7 +110,7 @@ const CustomAppBar = forwardRef(({ onSearch }, ref) => {
           >
             <SearchIcon sx={{ color: "#FFF" }} />
             <InputBase
-              inputRef={searchInputRef} 
+              inputRef={searchInputRef}
               value={searchInput}
               onChange={handleSearchChange}
               placeholder="Digite aqui para buscar..."
@@ -153,15 +150,14 @@ const CustomAppBar = forwardRef(({ onSearch }, ref) => {
               >
                 <MenuItem onClick={handleLogout}>Sair</MenuItem>
                 <MenuItem
-                      onClick={() => {
-                        handleMenuClose();
-                        navigate('/profile');
-                      }}
-                    >
-                      Perfil
-                    </MenuItem>
-              </Menu> 
-             
+                  onClick={() => {
+                    handleMenuClose();
+                    navigate("/profile");
+                  }}
+                >
+                  Perfil
+                </MenuItem>
+              </Menu>
             </>
           ) : (
             <Button
@@ -189,9 +185,7 @@ const CustomAppBar = forwardRef(({ onSearch }, ref) => {
       </Toolbar>
 
       <Dialog open={open} onClose={handleLoginClose}>
-        <DialogTitle>
-          {username ? "Você está logado!" : "Login"}
-        </DialogTitle>
+        <DialogTitle>{username ? "Você está logado!" : "Login"}</DialogTitle>
         <DialogContent>
           {username ? (
             <Typography variant="body1">Bem-vindo, {username}!</Typography>
@@ -204,7 +198,6 @@ const CustomAppBar = forwardRef(({ onSearch }, ref) => {
             Fechar
           </Button>
         </DialogActions>
-        
       </Dialog>
     </AppBar>
   );

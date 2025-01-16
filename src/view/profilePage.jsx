@@ -1,18 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getUserById, getPostsByUser, updateUser, deletePost, updatePost } from "../service/service";
+import {
+  getUserById,
+  getPostsByUser,
+  updateUser,
+  deletePost,
+  updatePost,
+} from "../service/service";
 import {
   Button,
   TextField,
   Box,
   Typography,
   Paper,
-  Grid, 
+  Grid,
   IconButton,
-
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-
 
 export default function ProfilePage() {
   const [userData, setUserData] = useState({
@@ -21,7 +25,7 @@ export default function ProfilePage() {
     senha: "",
     email: "",
     idade: 0,
-    role: ""
+    role: "",
   });
   const [userPosts, setUserPosts] = useState([]);
   const [editingPost, setEditingPost] = useState(null);
@@ -35,17 +39,16 @@ export default function ProfilePage() {
     fetchUserPosts();
   }, [idusuario]);
 
-
   async function fetchUserData() {
     try {
       const user = await getUserById(idusuario);
       setUserData({
         nome: user.nome || "",
         login: user.login || "",
-        senha: "", 
+        senha: "",
         email: user.email || "",
         idade: user.idade || 0,
-        role: user.role || ""
+        role: user.role || "",
       });
     } catch (error) {
       console.error("Erro ao buscar dados do usuário:", error);
@@ -93,8 +96,6 @@ export default function ProfilePage() {
     }
   }
   const navigate = useNavigate();
-
-
   return (
     <Box
       sx={{
@@ -103,13 +104,16 @@ export default function ProfilePage() {
         minHeight: "100vh",
         backgroundColor: "#17202a",
         paddingTop: "70px",
-        boxSizing: "border-box"
+        boxSizing: "border-box",
       }}
     >
-      <IconButton sx={{ ml: "10px", color: "#FFF" }} onClick={() => navigate("/")}>
-            <ArrowBackIcon />
+      <IconButton
+        sx={{ ml: "10px", color: "#FFF" }}
+        onClick={() => navigate("/")}
+      >
+        <ArrowBackIcon />
         Home
-          </IconButton>
+      </IconButton>
       <Grid container sx={{ height: "100%", padding: 2 }} spacing={2}>
         <Grid item xs={12} md={6}>
           <Box
@@ -118,7 +122,7 @@ export default function ProfilePage() {
               padding: 3,
               borderRadius: 2,
               color: "#FFF",
-              height: "100%"
+              height: "100%",
             }}
           >
             <Typography variant="h5" sx={{ marginBottom: 2 }}>
@@ -130,7 +134,9 @@ export default function ProfilePage() {
               variant="outlined"
               fullWidth
               value={userData.nome}
-              onChange={(e) => setUserData({ ...userData, nome: e.target.value })}
+              onChange={(e) =>
+                setUserData({ ...userData, nome: e.target.value })
+              }
               sx={{ marginBottom: 2 }}
               InputProps={{ style: { color: "#FFF" } }}
               InputLabelProps={{ style: { color: "#FFF" } }}
@@ -141,7 +147,9 @@ export default function ProfilePage() {
               variant="outlined"
               fullWidth
               value={userData.login}
-              onChange={(e) => setUserData({ ...userData, login: e.target.value })}
+              onChange={(e) =>
+                setUserData({ ...userData, login: e.target.value })
+              }
               sx={{ marginBottom: 2 }}
               InputProps={{ style: { color: "#FFF" } }}
               InputLabelProps={{ style: { color: "#FFF" } }}
@@ -153,7 +161,9 @@ export default function ProfilePage() {
               variant="outlined"
               fullWidth
               value={userData.senha}
-              onChange={(e) => setUserData({ ...userData, senha: e.target.value })}
+              onChange={(e) =>
+                setUserData({ ...userData, senha: e.target.value })
+              }
               sx={{ marginBottom: 2 }}
               InputProps={{ style: { color: "#FFF" } }}
               InputLabelProps={{ style: { color: "#FFF" } }}
@@ -164,7 +174,9 @@ export default function ProfilePage() {
               variant="outlined"
               fullWidth
               value={userData.email}
-              onChange={(e) => setUserData({ ...userData, email: e.target.value })}
+              onChange={(e) =>
+                setUserData({ ...userData, email: e.target.value })
+              }
               sx={{ marginBottom: 2 }}
               InputProps={{ style: { color: "#FFF" } }}
               InputLabelProps={{ style: { color: "#FFF" } }}
@@ -176,12 +188,16 @@ export default function ProfilePage() {
               variant="outlined"
               fullWidth
               value={userData.idade}
-              onChange={(e) => setUserData({ ...userData, idade: parseInt(e.target.value) || 0 })}
+              onChange={(e) =>
+                setUserData({
+                  ...userData,
+                  idade: parseInt(e.target.value) || 0,
+                })
+              }
               sx={{ marginBottom: 2 }}
               InputProps={{ style: { color: "#FFF" } }}
               InputLabelProps={{ style: { color: "#FFF" } }}
             />
-
 
             <Button variant="contained" onClick={handleUpdateUser}>
               SALVAR ALTERAÇÕES
@@ -197,7 +213,7 @@ export default function ProfilePage() {
               borderRadius: 2,
               color: "#FFF",
               height: "100%",
-              overflowY: "auto"
+              overflowY: "auto",
             }}
           >
             <Typography variant="h5" sx={{ marginBottom: 2 }}>
@@ -210,7 +226,7 @@ export default function ProfilePage() {
                   marginBottom: 2,
                   padding: 2,
                   backgroundColor: "#1E252B",
-                  color: "#FFF"
+                  color: "#FFF",
                 }}
               >
                 {editingPost === post.idpost ? (
@@ -224,7 +240,9 @@ export default function ProfilePage() {
                         const newVal = e.target.value;
                         setUserPosts((prev) =>
                           prev.map((p) =>
-                            p.idpost === post.idpost ? { ...p, titulo: newVal } : p
+                            p.idpost === post.idpost
+                              ? { ...p, titulo: newVal }
+                              : p
                           )
                         );
                       }}
@@ -242,7 +260,9 @@ export default function ProfilePage() {
                         const newVal = e.target.value;
                         setUserPosts((prev) =>
                           prev.map((p) =>
-                            p.idpost === post.idpost ? { ...p, conteudo: newVal } : p
+                            p.idpost === post.idpost
+                              ? { ...p, conteudo: newVal }
+                              : p
                           )
                         );
                       }}
@@ -256,12 +276,16 @@ export default function ProfilePage() {
                     >
                       Salvar
                     </Button>
-                    <Button onClick={() => setEditingPost(null)}>Cancelar</Button>
+                    <Button onClick={() => setEditingPost(null)}>
+                      Cancelar
+                    </Button>
                   </>
                 ) : (
                   <>
                     <Typography variant="h6">{post.titulo}</Typography>
-                    <Typography sx={{ marginBottom: 1 }}>{post.conteudo}</Typography>
+                    <Typography sx={{ marginBottom: 1 }}>
+                      {post.conteudo}
+                    </Typography>
                     <Button
                       onClick={() => setEditingPost(post.idpost)}
                       variant="outlined"

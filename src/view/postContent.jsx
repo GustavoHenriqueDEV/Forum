@@ -7,7 +7,6 @@ import {
   createResposta,
   getRespostasByComentario,
 } from "../service/service";
-import FavoriteIcon from "@mui/icons-material/Favorite";
 import CommentIcon from "@mui/icons-material/Comment";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Sidebar from "../components/Sidebar";
@@ -20,7 +19,6 @@ import {
   CircularProgress,
   Paper,
   IconButton,
-  Badge,
   Avatar,
   Collapse,
 } from "@mui/material";
@@ -76,18 +74,18 @@ export default function PostContent() {
       alert("Usuário não autenticado!");
       return;
     }
-  
+
     try {
       const comentario = {
         conteudo: newComment,
         usuario: { idusuario: parseInt(idusuarioLocal) },
       };
-  
+
       await createComentario(idpost, comentario);
-  
+
       const updatedComments = await getComentariosByPost(idpost);
       setComments(updatedComments);
-  
+
       const inicial = {};
       updatedComments.forEach((comment) => {
         inicial[comment.idcomentario] = {
@@ -97,14 +95,13 @@ export default function PostContent() {
         };
       });
       setRespostasPorComentario(inicial);
-  
+
       setNewComment("");
     } catch (error) {
       console.error("Erro ao criar comentário:", error);
       alert("Erro ao publicar comentário.");
     }
   };
-
 
   const handleToggleRespostas = async (idcomentario) => {
     const jaAberto = respostasPorComentario[idcomentario]?.aberto;
@@ -144,35 +141,33 @@ export default function PostContent() {
     }));
   };
 
-const handleCreateResposta = async (idcomentario) => {
-  const idusuarioLocal = localStorage.getItem("idusuario");
-  if (!idusuarioLocal) {
-    alert("Usuário não autenticado!");
-    return;
-  }
+  const handleCreateResposta = async (idcomentario) => {
+    const idusuarioLocal = localStorage.getItem("idusuario");
+    if (!idusuarioLocal) {
+      alert("Usuário não autenticado!");
+      return;
+    }
 
-  try {
-    const respostaBody = {
-      conteudo: respostasPorComentario[idcomentario].novaResposta,
-      idUsuario: parseInt(idusuarioLocal),
-    };
+    try {
+      const respostaBody = {
+        conteudo: respostasPorComentario[idcomentario].novaResposta,
+        idUsuario: parseInt(idusuarioLocal),
+      };
 
-    const createdResposta = await createResposta(idcomentario, respostaBody);
-    setRespostasPorComentario((prev) => ({
-      ...prev,
-      [idcomentario]: {
-        ...prev[idcomentario],
-        respostas: [...prev[idcomentario].respostas, createdResposta],
-        novaResposta: "", 
-      },
-    }));
-  } catch (error) {
-    console.error("Erro ao criar resposta:", error);
-    alert("Erro ao publicar resposta.");
-  }
-};
-
-
+      const createdResposta = await createResposta(idcomentario, respostaBody);
+      setRespostasPorComentario((prev) => ({
+        ...prev,
+        [idcomentario]: {
+          ...prev[idcomentario],
+          respostas: [...prev[idcomentario].respostas, createdResposta],
+          novaResposta: "",
+        },
+      }));
+    } catch (error) {
+      console.error("Erro ao criar resposta:", error);
+      alert("Erro ao publicar resposta.");
+    }
+  };
 
   if (loading) {
     return (
@@ -203,7 +198,9 @@ const handleCreateResposta = async (idcomentario) => {
   if (!post) {
     return (
       <Box textAlign="center" p={3} bgcolor="#2A2F38" borderRadius={2}>
-        <Typography style={{ color: "#FFF" }}>Nenhum post encontrado.</Typography>
+        <Typography style={{ color: "#FFF" }}>
+          Nenhum post encontrado.
+        </Typography>
       </Box>
     );
   }
@@ -213,13 +210,15 @@ const handleCreateResposta = async (idcomentario) => {
       style={{
         display: "flex",
         paddingTop: "64px",
-        marginTop:"20px",
+        marginTop: "20px",
         minHeight: "100vh",
         width: "100%",
         backgroundColor: "#17202a",
       }}
     >
-      <div style={{ zIndex: 1000, overflow: "hidden", backgroundColor: "#17202a" }}>
+      <div
+        style={{ zIndex: 1000, overflow: "hidden", backgroundColor: "#17202a" }}
+      >
         <Sidebar />
       </div>
 
@@ -231,7 +230,7 @@ const handleCreateResposta = async (idcomentario) => {
         boxShadow={3}
         borderRadius={2}
         color="#FFF"
-        sx={{ height:"90%", width: "70%" }}
+        sx={{ height: "90%", width: "70%" }}
       >
         <Typography
           sx={{
@@ -240,7 +239,10 @@ const handleCreateResposta = async (idcomentario) => {
             marginBottom: 2,
           }}
         >
-          <IconButton sx={{ mr: "4px", color: "#FFF" }} onClick={() => navigate("/")}>
+          <IconButton
+            sx={{ mr: "4px", color: "#FFF" }}
+            onClick={() => navigate("/")}
+          >
             <ArrowBackIcon />
           </IconButton>
           <Avatar sx={{ width: "23px", height: "23px", marginRight: 1 }} />
@@ -282,9 +284,6 @@ const handleCreateResposta = async (idcomentario) => {
           />
         )}
         <Box sx={{ borderBottom: "3px solid #444" }} />
-
-       
-
         <Button
           variant="contained"
           style={{
@@ -336,15 +335,17 @@ const handleCreateResposta = async (idcomentario) => {
                       ? "Ocultar Respostas"
                       : "Ver Respostas"}
                   </Button>
-
                   <Collapse
                     in={respostasPorComentario[comment.idcomentario]?.aberto}
                     timeout="auto"
                     unmountOnExit
                   >
                     <Box mt={1} sx={{ pl: 2, borderLeft: "2px solid #444" }}>
-                      {respostasPorComentario[comment.idcomentario]?.respostas?.length > 0 ? (
-                        respostasPorComentario[comment.idcomentario].respostas.map((resposta) => (
+                      {respostasPorComentario[comment.idcomentario]?.respostas
+                        ?.length > 0 ? (
+                        respostasPorComentario[
+                          comment.idcomentario
+                        ].respostas.map((resposta) => (
                           <Paper
                             key={resposta.id}
                             elevation={1}
@@ -361,7 +362,10 @@ const handleCreateResposta = async (idcomentario) => {
                             >
                               {resposta.usuario?.nome || "Anônimo"}:
                             </Typography>
-                            <Typography style={{ color: "#D4D4D4" }} variant="body2">
+                            <Typography
+                              style={{ color: "#D4D4D4" }}
+                              variant="body2"
+                            >
                               {resposta.conteudo}
                             </Typography>
                           </Paper>
@@ -369,7 +373,11 @@ const handleCreateResposta = async (idcomentario) => {
                       ) : (
                         <Typography
                           variant="body2"
-                          style={{ color: "#D4D4D4", fontStyle: "italic", marginTop: 8 }}
+                          style={{
+                            color: "#D4D4D4",
+                            fontStyle: "italic",
+                            marginTop: 8,
+                          }}
                         >
                           Não há respostas ainda.
                         </Typography>
@@ -381,10 +389,14 @@ const handleCreateResposta = async (idcomentario) => {
                           variant="outlined"
                           placeholder="Escreva uma resposta..."
                           value={
-                            respostasPorComentario[comment.idcomentario]?.novaResposta || ""
+                            respostasPorComentario[comment.idcomentario]
+                              ?.novaResposta || ""
                           }
                           onChange={(e) =>
-                            handleChangeNovaResposta(comment.idcomentario, e.target.value)
+                            handleChangeNovaResposta(
+                              comment.idcomentario,
+                              e.target.value
+                            )
                           }
                           style={{
                             backgroundColor: "#2A2F38",
@@ -401,7 +413,9 @@ const handleCreateResposta = async (idcomentario) => {
                             backgroundColor: "#00D1B2",
                             color: "#FFF",
                           }}
-                          onClick={() => handleCreateResposta(comment.idcomentario)}
+                          onClick={() =>
+                            handleCreateResposta(comment.idcomentario)
+                          }
                         >
                           Responder
                         </Button>
@@ -415,7 +429,6 @@ const handleCreateResposta = async (idcomentario) => {
                 Nenhum comentário ainda.
               </Typography>
             )}
-
             <Box mt={2} display="flex" gap={2}>
               <TextField
                 fullWidth
