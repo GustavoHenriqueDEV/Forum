@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { getUserById, getPostsByUser, updateUser, deletePost, updatePost } from "../service/service";
 import {
   Button,
@@ -6,8 +7,12 @@ import {
   Box,
   Typography,
   Paper,
-  Grid
+  Grid, 
+  IconButton,
+
 } from "@mui/material";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+
 
 export default function ProfilePage() {
   const [userData, setUserData] = useState({
@@ -29,6 +34,7 @@ export default function ProfilePage() {
     fetchUserData();
     fetchUserPosts();
   }, [idusuario]);
+
 
   async function fetchUserData() {
     try {
@@ -86,6 +92,8 @@ export default function ProfilePage() {
       console.error(error);
     }
   }
+  const navigate = useNavigate();
+
 
   return (
     <Box
@@ -98,6 +106,10 @@ export default function ProfilePage() {
         boxSizing: "border-box"
       }}
     >
+      <IconButton sx={{ ml: "10px", color: "#FFF" }} onClick={() => navigate("/")}>
+            <ArrowBackIcon />
+        Home
+          </IconButton>
       <Grid container sx={{ height: "100%", padding: 2 }} spacing={2}>
         <Grid item xs={12} md={6}>
           <Box
