@@ -9,8 +9,20 @@ import {
 } from "@mui/material";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import BarChartIcon from "@mui/icons-material/BarChart";
+import { useLocation } from "react-router-dom";
+
+
+
 
 export default function Sidebar({ setFilter }) {
+
+
+
+  const location = useLocation();
+  if (location.pathname === "/profile") {
+    return null; 
+  }
+
   return (
     <Box
       sx={{

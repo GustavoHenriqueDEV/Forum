@@ -4,6 +4,7 @@ import Dashboard from "./view/dashBoard";
 import PostContent from "./view/postContent";
 import CustomAppBar from "./components/appBar";
 import Sidebar from "./components/Sidebar";
+import ProfilePage from "./view/profilePage";
 
 export default function App() {
   const [searchTerm, setSearchTerm] = useState(""); // Estado global para o termo de pesquisa
@@ -18,10 +19,8 @@ export default function App() {
       <Sidebar focusSearch={() => appBarRef.current?.focusSearch()} />
 
       <Routes>
-        <Route
-          path="/"
-          element={<Dashboard searchTerm={searchTerm} />}
-        />
+        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/"element={<Dashboard searchTerm={searchTerm} />}/>
         <Route path="/post/:idpost" element={<PostContent />} />
       </Routes>
     </Router>

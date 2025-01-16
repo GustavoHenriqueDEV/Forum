@@ -179,3 +179,34 @@ export const deletePost = async (idPost) => {
     throw error;
   }
 };
+export const getPostsByUser = async (idusuario) => {
+  const token = localStorage.getItem("token");
+  // Supõe que o endpoint seja GET /usuarios/{id}/posts
+  const response = await axios.get(`${API_URL}/usuarios/${idusuario}/posts`, {
+    headers: {
+      "Authorization": `Bearer ${token}`
+    }
+  });
+  return response.data;
+};
+
+export const updateUser = async (idusuario, userData) => {
+  const token = localStorage.getItem("token");
+  const response = await axios.put(`${API_URL}/usuarios/${idusuario}`, userData, {
+    headers: {
+      "Authorization": `Bearer ${token}`
+    }
+  });
+  return response.data;
+};
+
+export const updatePost = async (idpost, postData) => {
+  const token = localStorage.getItem("token");
+  const response = await axios.put(`${API_URL}/posts/${idpost}`, postData, {
+    headers: {
+      "Authorization": `Bearer ${token}`
+    }
+  });
+  return response.data;
+};
+

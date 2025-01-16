@@ -15,6 +15,7 @@ import Avatar from "@mui/material/Avatar";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import AuthPage from "./AuthPage"; 
+import { useNavigate } from "react-router-dom";
 
 const CustomAppBar = forwardRef(({ onSearch }, ref) => {
   const [searchInput, setSearchInput] = useState("");
@@ -66,7 +67,7 @@ const CustomAppBar = forwardRef(({ onSearch }, ref) => {
       .join("")
       .toUpperCase();
   };
-
+  const navigate = useNavigate();
   return (
     <AppBar
       position="fixed"
@@ -151,7 +152,16 @@ const CustomAppBar = forwardRef(({ onSearch }, ref) => {
                 aria-label="Menu do usuário"
               >
                 <MenuItem onClick={handleLogout}>Sair</MenuItem>
-              </Menu>
+                <MenuItem
+                      onClick={() => {
+                        handleMenuClose();
+                        navigate('/profile');
+                      }}
+                    >
+                      Perfil
+                    </MenuItem>
+              </Menu> 
+             
             </>
           ) : (
             <Button
@@ -194,6 +204,7 @@ const CustomAppBar = forwardRef(({ onSearch }, ref) => {
             Fechar
           </Button>
         </DialogActions>
+        
       </Dialog>
     </AppBar>
   );
