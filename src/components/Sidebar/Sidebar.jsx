@@ -11,16 +11,11 @@ import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import { useLocation } from "react-router-dom";
 
-
-
-
 export default function Sidebar({ setFilter }) {
-
-
-
   const location = useLocation();
+  
   if (location.pathname === "/profile") {
-    return null; 
+    return null;
   }
 
   return (
@@ -30,7 +25,7 @@ export default function Sidebar({ setFilter }) {
         left: 0,
         top: "70px",
         width: "240px",
-        height: "calc(100vh - 64px)", 
+        height: "calc(100vh - 64px)",
         borderRight: "1px solid #3e4142",
         backgroundColor: "#1e252b",
         color: "#d7dadc",
@@ -47,7 +42,7 @@ export default function Sidebar({ setFilter }) {
             transition: "transform 0.3s, background-color 0.3s",
             "&:hover": {
               transform: "scale(1.05)",
-              backgroundColor: "#333", 
+              backgroundColor: "#333",
             },
           }}
         >
@@ -64,7 +59,7 @@ export default function Sidebar({ setFilter }) {
             transition: "transform 0.3s, background-color 0.3s",
             "&:hover": {
               transform: "scale(1.05)",
-              backgroundColor: "#333", 
+              backgroundColor: "#333",
             },
           }}
         >

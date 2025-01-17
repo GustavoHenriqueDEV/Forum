@@ -1,28 +1,35 @@
-import React, { useState, useRef } from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import Dashboard from "./view/dashBoard";
-import PostContent from "./view/postContent";
-import CustomAppBar from "./components/appBar";
-import Sidebar from "./components/Sidebar";
-import ProfilePage from "./view/profilePage";
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./hooks/useAuth";
+import CustomAppBar from "./components/AppBar/CustomAppBar";
+import Dashboard from "./pages/Dashboard/Dashboard";
+import PostContent from "./pages/Post/PostContent";
+import ProfilePage from "./pages/Profile/ProfilePage";
+import { ThemeProvider } from "@mui/material/styles";
+import theme from "./theme";
 
-export default function App() {
-  const [searchTerm, setSearchTerm] = useState(""); // Estado global para o termo de pesquisa
-  const appBarRef = useRef(null); // Crie um ref para o CustomAppBar
+function App() {
+  const [searchTerm, setSearchTerm] = React.useState("");
+
+  const handleSearch = (term) => {
+    setSearchTerm(term);
+  };
 
   return (
-    <Router>
-      {/* Passa o callback onSearch para CustomAppBar */}
-      <CustomAppBar ref={appBarRef} onSearch={(term) => setSearchTerm(term)} />
-
-      {/* Passa focusSearch corretamente para Sidebar */}
-      <Sidebar focusSearch={() => appBarRef.current?.focusSearch()} />
-
-      <Routes>
-        <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/"element={<Dashboard searchTerm={searchTerm} />}/>
-        <Route path="/post/:idpost" element={<PostContent />} />
-      </Routes>
-    </Router>
+    <AuthProvider>
+      <ThemeProvider theme={theme}>
+        <Router>
+          <CustomAppBar onSearch={handleSearch} />
+          <Routes>
+            <Route path="/" element={<Dashboard searchTerm={searchTerm} />} />
+            <Route path="/post/:idpost" element={<PostContent />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            {/* Adicione outras rotas conforme necessário */}
+          </Routes>
+        </Router>
+      </ThemeProvider>
+    </AuthProvider>
   );
 }
+
+export default App;

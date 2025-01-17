@@ -1,35 +1,44 @@
-import React, {
-  useState,
-  useRef,
-  forwardRef,
-  useImperativeHandle,
-} from "react";
+import React, { useState, useRef, forwardRef, useImperativeHandle } from "react";
 import PropTypes from "prop-types";
-import AppBar from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import InputBase from "@mui/material/InputBase";
-import SearchIcon from "@mui/icons-material/Search";
-import DialogTitle from "@mui/material/DialogTitle";
-import Avatar from "@mui/material/Avatar";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
-import AuthPage from "./AuthPage";
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  InputBase,
+  Avatar,
+  Menu,
+  MenuItem,
+  DialogTitle,
+} from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import SearchIcon from "@mui/icons-material/Search";
+import AuthPage from "../Auth/AuthPage";
+import { getInitials } from "../../utils/helpers";
+import { useAuth } from "../../hooks/useAuth";
+import AvatarWithInitials from "../common/AvatarWithInitials";
+
 
 const CustomAppBar = forwardRef(({ onSearch }, ref) => {
   const [searchInput, setSearchInput] = useState("");
   const [open, setOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const username = localStorage.getItem("username");
-
   const searchInputRef = useRef(null);
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
 
+  useImperativeHandle(ref, () => ({
+    focusSearch() {
+      if (searchInputRef.current) {
+        searchInputRef.current.focus();
+      }
+    },
+  }));
   const handleSearchChange = (e) => {
     const value = e.target.value;
     setSearchInput(value);
@@ -57,31 +66,10 @@ const CustomAppBar = forwardRef(({ onSearch }, ref) => {
     setAnchorEl(null);
   };
 
-  const getInitials = (name) => {
-    return name
-      .split(" ")
-      .map((word) => word[0])
-      .join("")
-      .toUpperCase();
-  };
-  const navigate = useNavigate();
   return (
-    <AppBar
-      position="fixed"
-      sx={{
-        borderBottom: "1px solid #3e4142",
-        backgroundColor: "#262D34",
-        padding: "0 16px",
-        height: 70,
-      }}
-    >
+    <AppBar position="fixed" sx={{  height:"80px", borderBottom:"1px solid #3e4142 ",  backgroundColor: "#1E252B", boxShadow: "none" }}>
       <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
-        <img
-          style={{ height: "90px", width: "90px" }}
-          src="..\src\assets\medical (1).png"
-          alt="Logo"
-          aria-label="Logo do site"
-        />
+        {/* Título */}
         <Typography
           variant="h6"
           sx={{ fontWeight: "bold", color: "#f4b842" }}
@@ -89,15 +77,9 @@ const CustomAppBar = forwardRef(({ onSearch }, ref) => {
         >
           UP THE FORUM!
         </Typography>
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            flex: 1,
-            justifyContent: "center",
-            gap: 2,
-          }}
-        >
+
+        {/* Campo de Busca */}
+        <Box sx={{ mt:"10px", display: "flex", alignItems: "center", flex: 1, justifyContent: "center", gap: 2 }}>
           <Box
             sx={{
               display: "flex",
@@ -115,33 +97,28 @@ const CustomAppBar = forwardRef(({ onSearch }, ref) => {
               onChange={handleSearchChange}
               placeholder="Digite aqui para buscar..."
               aria-label="Campo de busca"
-              sx={{
-                color: "#FFF",
-                marginLeft: 1,
-                flex: 1,
-                fontSize: "0.875rem",
-              }}
+              sx={{ color: "#FFF", marginLeft: 1, flex: 1, fontSize: "0.875rem" }}
             />
           </Box>
         </Box>
 
+        {/* Autenticação */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           {username ? (
             <>
-              <Avatar
+              <AvatarWithInitials
+                name={username}
                 sx={{
-                  bgcolor: "#FF6F00",
-                  color: "#FFF",
-                  width: 36,
-                  height: 36,
-                  fontSize: "1rem",
-                  cursor: "pointer",
+                    bgcolor: "#FF6F00",
+                    color: "#FFF",
+                    width: 36,
+                    height: 36,
+                    fontSize: "1rem",
+                    cursor: "pointer",
                 }}
                 onClick={handleAvatarClick}
                 aria-label="Abrir menu do usuário"
-              >
-                {getInitials(username)}
-              </Avatar>
+                />
               <Menu
                 anchorEl={anchorEl}
                 open={Boolean(anchorEl)}

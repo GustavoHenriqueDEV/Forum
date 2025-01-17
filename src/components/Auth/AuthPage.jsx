@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import axios from "axios";
+import PropTypes from "prop-types";
+import { loginUser, registerUser } from "../../services/authSevice";
 import {
   TextField,
   Button,
@@ -25,25 +26,30 @@ export default function AuthPage({ onClose }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const url = isLogin
-        ? "http://localhost:8080/usuarios/login"
-        : "http://localhost:8080/usuarios/register";
-      const response = await axios.post(url, formData);
       if (isLogin) {
-        console.log("Resposta da API:", response.data);
-        localStorage.clear();
-        localStorage.setItem("idusuario", response.data.idusuario);
-        localStorage.setItem("username", response.data.nome); 
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('role', response.data.role)
-        console.log(response.data.token);
-        console.log(response.data.role);
+        const response = await loginUser({
+          login: formData.login,
+          senha: formData.senha,
+        });
+        console.log("Resposta da API:", response);
+        console.log("iduser:", response.idusuario);
 
+        localStorage.clear();
+        localStorage.setItem("idusuario", response.idusuario);
+        localStorage.setItem("username", response.nome);
+        localStorage.setItem("token", response.token);
+        localStorage.setItem("role", response.role);
         alert("Login realizado com sucesso!");
         onClose();
       } else {
+        await registerUser({
+          login: formData.login,
+          senha: formData.senha,
+          nome: formData.nome,
+          email: formData.email,
+        });
         alert("Usuário registrado com sucesso!");
-        setIsLogin(true); 
+        setIsLogin(true);
       }
     } catch (error) {
       console.error("Erro:", error);
@@ -56,10 +62,10 @@ export default function AuthPage({ onClose }) {
       maxWidth="xs"
       sx={{
         padding: 3,
-        backgroundColor: "#3A3F47", 
+        backgroundColor: "#3A3F47",
         borderRadius: 2,
         boxShadow: 3,
-        backdropFilter: "blur(10px)", 
+        backdropFilter: "blur(10px)",
       }}
     >
       <Box>
@@ -83,9 +89,15 @@ export default function AuthPage({ onClose }) {
             margin="normal"
             required
             sx={{
-              backgroundColor: "#2A2F36", 
+              backgroundColor: "#2A2F36",
               borderRadius: "4px",
               color: "#FFF",
+            }}
+            InputProps={{
+              style: { color: "#FFF" },
+            }}
+            InputLabelProps={{
+              style: { color: "#FFF" },
             }}
           />
           <TextField
@@ -98,9 +110,15 @@ export default function AuthPage({ onClose }) {
             margin="normal"
             required
             sx={{
-              backgroundColor: "#2A2F36", 
+              backgroundColor: "#2A2F36",
               borderRadius: "4px",
               color: "#FFF",
+            }}
+            InputProps={{
+              style: { color: "#FFF" },
+            }}
+            InputLabelProps={{
+              style: { color: "#FFF" },
             }}
           />
 
@@ -116,9 +134,15 @@ export default function AuthPage({ onClose }) {
                 margin="normal"
                 required
                 sx={{
-                  backgroundColor: "#2A2F36", 
+                  backgroundColor: "#2A2F36",
                   borderRadius: "4px",
                   color: "#FFF",
+                }}
+                InputProps={{
+                  style: { color: "#FFF" },
+                }}
+                InputLabelProps={{
+                  style: { color: "#FFF" },
                 }}
               />
               <TextField
@@ -131,9 +155,15 @@ export default function AuthPage({ onClose }) {
                 margin="normal"
                 required
                 sx={{
-                  backgroundColor: "#2A2F36", 
+                  backgroundColor: "#2A2F36",
                   borderRadius: "4px",
                   color: "#FFF",
+                }}
+                InputProps={{
+                  style: { color: "#FFF" },
+                }}
+                InputLabelProps={{
+                  style: { color: "#FFF" },
                 }}
               />
             </>
@@ -146,9 +176,9 @@ export default function AuthPage({ onClose }) {
             fullWidth
             sx={{
               marginTop: 2,
-              backgroundColor: "#FF6F00", 
+              backgroundColor: "#FF6F00",
               "&:hover": {
-                backgroundColor: "#E65100", 
+                backgroundColor: "#E65100",
               },
             }}
           >
@@ -163,12 +193,13 @@ export default function AuthPage({ onClose }) {
             variant="body2"
             sx={{ color: "#FF6F00" }}
           >
-            {isLogin
-              ? "Não tem uma conta? Registrar"
-              : "Já tem uma conta? Login"}
+            {isLogin ? "Não tem uma conta? Registrar" : "Já tem uma conta? Login"}
           </Link>
         </Box>
       </Box>
     </Container>
   );
 }
+AuthPage.propTypes = {
+  onClose: PropTypes.func.isRequired,
+};
