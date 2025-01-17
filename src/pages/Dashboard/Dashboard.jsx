@@ -20,7 +20,12 @@ import {
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import ImageIcon from "@mui/icons-material/Image";
 import { createFilterOptions } from "@mui/material/Autocomplete";
-import { deletePost, getPosts, createPost, incrementLikes } from "../../services/postService";
+import {
+  deletePost,
+  getPosts,
+  createPost,
+  incrementLikes,
+} from "../../services/postService";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../../components/Sidebar/Sidebar";
 import AvatarWithInitials from "../../components/common/AvatarWithInitials";
@@ -45,7 +50,7 @@ export default function Dashboard({ searchTerm }) {
     imagem: "",
     data_criacao: "",
   });
-  const role = localStorage.getItem("role");
+  const role = localStorage.getItem("role"); ///Usar useMemo
   const navigate = useNavigate();
 
   const handleDelete = async (idpost) => {
@@ -59,7 +64,7 @@ export default function Dashboard({ searchTerm }) {
       setTimeout(() => setFeedbackMessage(""), 3000);
       console.error(error);
     }
-  };
+  }; ///tanStack funções //useQuery e useMutation
 
   const handlePostClick = (idpost) => {
     navigate(`/post/${idpost}`);
@@ -106,7 +111,7 @@ export default function Dashboard({ searchTerm }) {
   function formatToISO(dateString) {
     if (!dateString) return null;
     return dateString.replace(" ", "T") + "Z";
-  }
+  } ///UseCallBack
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -122,7 +127,7 @@ export default function Dashboard({ searchTerm }) {
       }
     };
     fetchPosts();
-  }, []);
+  }, []); ///TanStack com useQuery
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -210,15 +215,30 @@ export default function Dashboard({ searchTerm }) {
           }, 2000);
         }}
       />
-      <Box sx={{ backgroundColor: "#1E252B", minHeight: "100vh", padding: 2, marginLeft: "240px" }}>
+      <Box
+        sx={{
+          backgroundColor: "#1E252B",
+          minHeight: "100vh",
+          padding: 2,
+          marginLeft: "240px",
+        }}
+      >
         <Grid container spacing={10}>
           <Grid item xs={12}>
-            <Box sx={{ ml:"300px", width:"1000px", display: "flex", alignItems: "center", marginBottom: 2 }}>
+            <Box
+              sx={{
+                ml: "300px",
+                width: "1000px",
+                display: "flex",
+                alignItems: "center",
+                marginBottom: 2,
+              }}
+            >
               <Box
                 sx={{
                   height: 86,
                   width: "60px",
-                  mt:"20px",
+                  mt: "20px",
                   flex: 1,
                   backgroundColor: "#262D34",
                   padding: 1,
@@ -241,7 +261,9 @@ export default function Dashboard({ searchTerm }) {
                     alignItems: "center",
                   }}
                 >
-                  <Typography sx={{ fontFamily: "Rubik, sans-serif", color: "#FFF" }}>
+                  <Typography
+                    sx={{ fontFamily: "Rubik, sans-serif", color: "#FFF" }}
+                  >
                     Compartilhe o que está pensando...
                   </Typography>
                 </Box>
@@ -255,7 +277,7 @@ export default function Dashboard({ searchTerm }) {
                     borderRadius: 4,
                     height: 61,
                     width: 142,
-                    color:"white",
+                    color: "white",
                     fontSize: 15,
                     fontWeight: "bold",
                     fontFamily: "Rubik, sans-serif",
@@ -456,9 +478,9 @@ export default function Dashboard({ searchTerm }) {
                 sx={{
                   fontFamily: "Rubik, sans-serif",
                   backgroundColor: "#262D34",
-                  minHeight:"400px",
-                  width:"1000px",
-                  ml:"300px",
+                  minHeight: "400px",
+                  width: "1000px",
+                  ml: "300px",
                   borderRadius: 4,
                   marginBottom: 2,
                   cursor: "pointer",
@@ -489,7 +511,10 @@ export default function Dashboard({ searchTerm }) {
                         fontWeight: "bold",
                       }}
                     >
-                      <AvatarWithInitials name={post.nome} sx={{ width: "23px", height: "23px", marginRight: 1 }} />
+                      <AvatarWithInitials
+                        name={post.nome}
+                        sx={{ width: "23px", height: "23px", marginRight: 1 }}
+                      />
                       {post.nome} •
                       <Typography
                         sx={{
@@ -500,11 +525,14 @@ export default function Dashboard({ searchTerm }) {
                         }}
                       >
                         {post.data_criacao
-                          ? new Date(post.data_criacao).toLocaleDateString("pt-BR", {
-                              day: "2-digit",
-                              month: "2-digit",
-                              year: "numeric",
-                            })
+                          ? new Date(post.data_criacao).toLocaleDateString(
+                              "pt-BR",
+                              {
+                                day: "2-digit",
+                                month: "2-digit",
+                                year: "numeric",
+                              }
+                            )
                           : "Data inválida"}
                       </Typography>
                     </Typography>
@@ -521,7 +549,6 @@ export default function Dashboard({ searchTerm }) {
                     </Typography>
                   </Box>
                   <Box sx={{ borderBottom: "3px solid #444" }} />
-                  {/* Imagem do Post */}
                   {post.imagembase64 && (
                     <Box
                       sx={{
@@ -542,13 +569,14 @@ export default function Dashboard({ searchTerm }) {
                       />
                     </Box>
                   )}
-                  {/* Tipo de Post */}
                   <Box sx={{ marginTop: 2 }}>
-                    <Fab variant="extended" sx={{ fontSize: "12px", height: "35px" }}>
+                    <Fab
+                      variant="extended"
+                      sx={{ fontSize: "12px", height: "35px" }}
+                    >
                       {post.tipo}
                     </Fab>
                   </Box>
-                  {/* Botões de Interação */}
                   <Box
                     sx={{
                       display: "flex",
@@ -577,8 +605,6 @@ export default function Dashboard({ searchTerm }) {
           </Grid>
         </Grid>
       </Box>
-
-      {/* Diálogo de Criação de Post já incluído acima */}
     </div>
   );
 }

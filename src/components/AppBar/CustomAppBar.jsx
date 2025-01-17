@@ -1,4 +1,10 @@
-import React, { useState, useRef, forwardRef, useImperativeHandle } from "react";
+/* eslint-disable react/display-name */
+import React, {
+  useState,
+  useRef,
+  forwardRef,
+  useImperativeHandle,
+} from "react";
 import PropTypes from "prop-types";
 import {
   AppBar,
@@ -21,7 +27,6 @@ import AuthPage from "../Auth/AuthPage";
 import { getInitials } from "../../utils/helpers";
 import { useAuth } from "../../hooks/useAuth";
 import AvatarWithInitials from "../common/AvatarWithInitials";
-
 
 const CustomAppBar = forwardRef(({ onSearch }, ref) => {
   const [searchInput, setSearchInput] = useState("");
@@ -67,7 +72,15 @@ const CustomAppBar = forwardRef(({ onSearch }, ref) => {
   };
 
   return (
-    <AppBar position="fixed" sx={{  height:"80px", borderBottom:"1px solid #3e4142 ",  backgroundColor: "#1E252B", boxShadow: "none" }}>
+    <AppBar
+      position="fixed"
+      sx={{
+        height: "80px",
+        borderBottom: "1px solid #3e4142 ",
+        backgroundColor: "#1E252B",
+        boxShadow: "none",
+      }}
+    >
       <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
         {/* Título */}
         <Typography
@@ -79,7 +92,16 @@ const CustomAppBar = forwardRef(({ onSearch }, ref) => {
         </Typography>
 
         {/* Campo de Busca */}
-        <Box sx={{ mt:"10px", display: "flex", alignItems: "center", flex: 1, justifyContent: "center", gap: 2 }}>
+        <Box
+          sx={{
+            mt: "10px",
+            display: "flex",
+            alignItems: "center",
+            flex: 1,
+            justifyContent: "center",
+            gap: 2,
+          }}
+        >
           <Box
             sx={{
               display: "flex",
@@ -97,7 +119,12 @@ const CustomAppBar = forwardRef(({ onSearch }, ref) => {
               onChange={handleSearchChange}
               placeholder="Digite aqui para buscar..."
               aria-label="Campo de busca"
-              sx={{ color: "#FFF", marginLeft: 1, flex: 1, fontSize: "0.875rem" }}
+              sx={{
+                color: "#FFF",
+                marginLeft: 1,
+                flex: 1,
+                fontSize: "0.875rem",
+              }}
             />
           </Box>
         </Box>
@@ -109,16 +136,16 @@ const CustomAppBar = forwardRef(({ onSearch }, ref) => {
               <AvatarWithInitials
                 name={username}
                 sx={{
-                    bgcolor: "#FF6F00",
-                    color: "#FFF",
-                    width: 36,
-                    height: 36,
-                    fontSize: "1rem",
-                    cursor: "pointer",
+                  bgcolor: "#FF6F00",
+                  color: "#FFF",
+                  width: 36,
+                  height: 36,
+                  fontSize: "1rem",
+                  cursor: "pointer",
                 }}
                 onClick={handleAvatarClick}
                 aria-label="Abrir menu do usuário"
-                />
+              />
               <Menu
                 anchorEl={anchorEl}
                 open={Boolean(anchorEl)}
