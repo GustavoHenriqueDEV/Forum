@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable react/prop-types */
 // src/components/CreatePostForm.jsx
 import React, { useState } from "react";
 import {
@@ -73,7 +71,7 @@ const CreatePostForm = ({ open, handleClose, onCreate }) => {
         },
       }}
       open={open}
-      onClose={handleClose} // Garante que o diálogo feche ao clicar fora ou pressionar "Esc"
+      onClose={handleClose}
     >
       <DialogTitle>Create a New Post</DialogTitle>
       <DialogContent>

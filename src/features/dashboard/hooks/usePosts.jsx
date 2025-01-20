@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   getPosts,
   createPostApi,
@@ -6,97 +6,83 @@ import {
   incrementLikes,
 } from "../../dashboard/api/postsCrd";
 
-export const usePosts = () => {
-  const [posts, setPosts] = useState([]);
-  const [feedbackMessage, setFeedbackMessage] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+const formatToISO = (dateString) => {
+  if (!dateString) return null;
+  return dateString.replace(" ", "T") + "Z";
+};
 
-  useEffect(() => {
-    fetchPosts();
-  }, []);
+export const usePosts = () => {
+  const queryClient = useQueryClient();
 
   const fetchPosts = async () => {
-    setIsLoading(true);
-    try {
-      const postsData = await getPosts();
-      const formattedPosts = postsData.map((p) => ({
-        ...p,
-        data_criacao: p.data_criacao ? formatToISO(p.data_criacao) : null,
-      }));
-      setPosts(formattedPosts);
-    } catch (error) {
-      console.error("Erro ao buscar posts:", error);
-      setFeedbackMessage("Erro ao buscar posts.");
-    } finally {
-      setIsLoading(false);
-    }
+    const postsData = await getPosts();
+    return postsData.map((p) => ({
+      ...p,
+      data_criacao: p.data_criacao ? formatToISO(p.data_criacao) : null,
+    }));
   };
 
-  const createPost = async (newPostData) => {
-    const idusuarioLocal = localStorage.getItem("idusuario");
-    if (!idusuarioLocal) {
-      throw new Error("Usuário não autenticado!");
-    }
-    try {
-      const createdPost = await createPostApi({
-        ...newPostData,
-        usuario: { idusuario: parseInt(idusuarioLocal) },
-      });
+  const {
+    data: posts = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["posts"],
+    queryFn: fetchPosts,
+  });
 
-      // Adicionar o novo post ao estado local
-      setPosts((prev) => [createdPost, ...prev]); // O novo post aparece no topo
-      setFeedbackMessage("Post criado com sucesso!");
-    } catch (error) {
+  const createPostMutation = useMutation({
+    mutationFn: createPostApi,
+    onSuccess: (newPost) => {
+      console.log("Post criado com sucesso:", newPost);
+      // Opção 1: Atualizar o cache manualmente
+      queryClient.setQueryData(["posts"], (old) => [newPost, ...(old || [])]);
+
+      // Opção 2: Invalidate e refetch
+      queryClient.invalidateQueries(["posts"]);
+    },
+    onError: (error) => {
       console.error("Erro ao criar post:", error);
-      throw new Error("Ocorreu um erro ao criar o post.");
-    }
-  };
+    },
+  });
 
-  const removePost = async (idpost) => {
-    try {
-      await deletePost(idpost);
-      setPosts((prev) => prev.filter((p) => p.idpost !== idpost));
-      setFeedbackMessage("Post deletado com sucesso!");
-    } catch (error) {
-      console.error("Erro ao deletar o post:", error);
-      setFeedbackMessage("Erro ao deletar o post.");
-    }
-  };
-
-  const likePost = async (idpost) => {
-    const idusuarioLocal = localStorage.getItem("idusuario");
-    if (!idusuarioLocal) {
-      throw new Error("Usuário não autenticado!");
-    }
-    try {
-      const updatedLikes = await incrementLikes(
-        idpost,
-        parseInt(idusuarioLocal)
+  const deletePostMutation = useMutation({
+    mutationFn: deletePost,
+    onSuccess: (_, idpost) => {
+      queryClient.setQueryData(["posts"], (old) =>
+        old.filter((post) => post.idpost !== idpost)
       );
-      setPosts((prev) =>
-        prev.map((post) =>
+    },
+    onError: (error) => {
+      console.error("Erro ao deletar o post:", error);
+    },
+  });
+
+  const likePostMutation = useMutation({
+    mutationFn: ({ idpost, idusuario }) => incrementLikes(idpost, idusuario),
+    onSuccess: (updatedLikes, variables) => {
+      const { idpost } = variables;
+      queryClient.setQueryData(["posts"], (old) =>
+        old.map((post) =>
           post.idpost === idpost ? { ...post, likes: updatedLikes } : post
         )
       );
-    } catch (error) {
+    },
+    onError: (error) => {
       console.error("Erro ao dar like:", error);
-      throw new Error("Erro ao incrementar likes.");
-    }
-  };
-
-  const formatToISO = (dateString) => {
-    if (!dateString) return null;
-    return dateString.replace(" ", "T") + "Z";
-  };
+    },
+  });
 
   return {
     posts,
-    feedbackMessage,
     isLoading,
-    fetchPosts,
-    createPost,
-    removePost,
-    likePost,
-    setFeedbackMessage,
+    isError,
+    error,
+    refetch,
+    createPost: createPostMutation.mutateAsync,
+    deletePost: deletePostMutation.mutateAsync,
+    likePost: likePostMutation.mutateAsync,
   };
 };

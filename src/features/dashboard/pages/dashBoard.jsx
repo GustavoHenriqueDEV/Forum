@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable react/prop-types */
 // src/pages/Dashboard/Dashboard.jsx
 import React, { useState } from "react";
 import {
@@ -13,8 +11,8 @@ import {
   Button,
   Badge,
   Fab,
+  CircularProgress,
 } from "@mui/material";
-import CircularProgress from "@mui/material/CircularProgress";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../../../components/sideBar/sideBar";
@@ -25,15 +23,17 @@ export default function Dashboard({ searchTerm }) {
   const [filterType, setFilterType] = useState("all");
   const [isLoadingFilter, setIsLoadingFilter] = useState(false);
   const [open, setOpen] = useState(false);
+  const [feedbackMessage, setFeedbackMessage] = useState("");
 
   const {
     posts,
-    feedbackMessage,
     isLoading,
+    isError,
+    error,
     createPost,
-    removePost,
+    deletePost,
     likePost,
-    setFeedbackMessage,
+    refetch,
   } = usePosts();
 
   const navigate = useNavigate();
@@ -41,7 +41,7 @@ export default function Dashboard({ searchTerm }) {
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
-    console.log("handleClose chamado"); // Log para depuração
+    console.log("handleClose chamado");
     setOpen(false);
   };
 
@@ -50,47 +50,6 @@ export default function Dashboard({ searchTerm }) {
   };
 
   console.log("searchTerm recebido no Dashboard:", searchTerm);
-
-  const filteredPosts = posts
-    .filter((post) => {
-      if (filterType === "popular") {
-        return post.likes >= 10;
-      }
-      return true;
-    })
-    .filter((post) => {
-      if (searchTerm) {
-        const lowercasedTerm = searchTerm.toLowerCase();
-        const matches =
-          post.titulo.toLowerCase().includes(lowercasedTerm) ||
-          post.nome.toLowerCase().includes(lowercasedTerm);
-        console.log(`Post: ${post.titulo}, Matches: ${matches}`);
-        return matches;
-      }
-      return true;
-    });
-
-  const handleCreatePost = async (newPostData) => {
-    try {
-      await createPost(newPostData);
-      setFeedbackMessage("Post criado com sucesso!");
-      setOpen(false);
-    } catch (error) {
-      alert(error.message);
-    }
-  };
-
-  const handleDelete = async (idpost) => {
-    await removePost(idpost);
-  };
-
-  const handleLike = async (idpost) => {
-    try {
-      await likePost(idpost);
-    } catch (error) {
-      alert(error.message);
-    }
-  };
 
   if (isLoading || isLoadingFilter) {
     return (
@@ -118,6 +77,86 @@ export default function Dashboard({ searchTerm }) {
       </Box>
     );
   }
+
+  if (isError) {
+    return (
+      <Box
+        sx={{
+          marginTop: "70px",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "calc(100vh - 70px)",
+          backgroundColor: "#1E252B",
+        }}
+      >
+        <Typography sx={{ color: "red", fontSize: "1.2rem" }}>
+          Erro ao carregar posts: {error.message}
+        </Typography>
+      </Box>
+    );
+  }
+
+  const filteredPosts = posts
+    ?.filter((post) => {
+      if (filterType === "popular") {
+        return post.likes >= 10;
+      }
+      return true;
+    })
+    .filter((post) => {
+      if (searchTerm) {
+        const lowercasedTerm = searchTerm.toLowerCase();
+        const matches =
+          post.titulo.toLowerCase().includes(lowercasedTerm) ||
+          post.nome.toLowerCase().includes(lowercasedTerm);
+        console.log(`Post: ${post.titulo}, Matches: ${matches}`);
+        return matches;
+      }
+      return true;
+    });
+
+  const handleCreatePost = async (newPostData) => {
+    const idusuarioLocal = localStorage.getItem("idusuario");
+    if (!idusuarioLocal) {
+      alert("Usuário não autenticado!");
+      return;
+    }
+    try {
+      await createPost({
+        ...newPostData,
+        usuario: { idusuario: parseInt(idusuarioLocal, 10) },
+      });
+      setFeedbackMessage("Post criado com sucesso!");
+      setOpen(false);
+      setTimeout(() => setFeedbackMessage(""), 3000);
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
+  const handleDelete = async (idpost) => {
+    try {
+      await deletePost(idpost);
+      setFeedbackMessage("Post deletado com sucesso!");
+      setTimeout(() => setFeedbackMessage(""), 3000);
+    } catch (error) {
+      alert("Erro ao deletar o post.");
+    }
+  };
+
+  const handleLike = async (idpost) => {
+    const idusuarioLocal = localStorage.getItem("idusuario");
+    if (!idusuarioLocal) {
+      alert("Usuário não autenticado!");
+      return;
+    }
+    try {
+      await likePost({ idpost, idusuario: parseInt(idusuarioLocal, 10) });
+    } catch (error) {
+      alert(error.message);
+    }
+  };
 
   return (
     <div style={{ marginTop: "70px" }}>
@@ -229,6 +268,7 @@ export default function Dashboard({ searchTerm }) {
                   borderRadius: 4,
                   marginBottom: 2,
                   position: "relative",
+                  cursor: "pointer",
                 }}
               >
                 {role === "ADMIN" && (
@@ -313,7 +353,7 @@ export default function Dashboard({ searchTerm }) {
                       }}
                     >
                       <img
-                        src={`data:image/png;base64,${post.imagembase64}`}
+                        src={`data:image/png;base64,${post.imagem}`}
                         alt="Ilustração do Post"
                         style={{
                           maxWidth: "100%",

@@ -1,3 +1,4 @@
+// src/dashboard/api/postsCrd.js
 import axios from "axios";
 
 const API_URL = "http://localhost:8080";
@@ -32,7 +33,7 @@ export const createPostApi = async (post) => {
     const response = await axios.post(`${API_URL}/posts`, post, {
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
     });
     return response.data;
@@ -47,7 +48,7 @@ export const updatePost = async (id, postData) => {
     const token = localStorage.getItem("token");
     const response = await axios.put(`${API_URL}/posts/${id}`, postData, {
       headers: {
-        "Authorization": `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
     });
     return response.data;
@@ -60,12 +61,12 @@ export const updatePost = async (id, postData) => {
 export const deletePost = async (id) => {
   try {
     const token = localStorage.getItem("token");
-    const response = await axios.delete(`${API_URL}/posts/${id}`, {
+    await axios.delete(`${API_URL}/posts/${id}`, {
       headers: {
-        "Authorization": `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
     });
-    return response.data;
+    return id;
   } catch (error) {
     console.error("Erro ao deletar post:", error);
     throw error;
@@ -81,11 +82,11 @@ export const incrementLikes = async (idpost, idusuario) => {
       {
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       }
     );
-    return response.data;
+    return response.data.likes;
   } catch (error) {
     console.error("Erro no serviço de likes:", error);
     throw error;
