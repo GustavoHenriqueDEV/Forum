@@ -1,5 +1,10 @@
 import { useState, useEffect } from "react";
-import { getPosts, createPostApi, deletePost, incrementLikes } from "../../dashboard/api/postsCrd";
+import {
+  getPosts,
+  createPostApi,
+  deletePost,
+  incrementLikes,
+} from "../../dashboard/api/postsCrd";
 
 export const usePosts = () => {
   const [posts, setPosts] = useState([]);
@@ -37,7 +42,9 @@ export const usePosts = () => {
         ...newPostData,
         usuario: { idusuario: parseInt(idusuarioLocal) },
       });
-      setPosts((prev) => [...prev, createdPost]);
+
+      // Adicionar o novo post ao estado local
+      setPosts((prev) => [createdPost, ...prev]); // O novo post aparece no topo
       setFeedbackMessage("Post criado com sucesso!");
     } catch (error) {
       console.error("Erro ao criar post:", error);
@@ -62,7 +69,10 @@ export const usePosts = () => {
       throw new Error("Usuário não autenticado!");
     }
     try {
-      const updatedLikes = await incrementLikes(idpost, parseInt(idusuarioLocal));
+      const updatedLikes = await incrementLikes(
+        idpost,
+        parseInt(idusuarioLocal)
+      );
       setPosts((prev) =>
         prev.map((post) =>
           post.idpost === idpost ? { ...post, likes: updatedLikes } : post

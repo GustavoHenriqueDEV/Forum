@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable react/prop-types */
 // src/pages/Dashboard/Dashboard.jsx
 import React, { useState } from "react";
 import {
@@ -23,7 +25,7 @@ export default function Dashboard({ searchTerm }) {
   const [filterType, setFilterType] = useState("all");
   const [isLoadingFilter, setIsLoadingFilter] = useState(false);
   const [open, setOpen] = useState(false);
-  
+
   const {
     posts,
     feedbackMessage,
@@ -31,9 +33,9 @@ export default function Dashboard({ searchTerm }) {
     createPost,
     removePost,
     likePost,
-    setFeedbackMessage
+    setFeedbackMessage,
   } = usePosts();
-  
+
   const navigate = useNavigate();
   const role = localStorage.getItem("role");
 
@@ -107,7 +109,7 @@ export default function Dashboard({ searchTerm }) {
           size={60}
           thickness={4}
           sx={{
-            color: "#FF6934", // Cor personalizada
+            color: "#FF6934",
           }}
         />
         <Typography sx={{ color: "#fff", marginTop: 2, fontSize: "1.2rem" }}>
@@ -128,10 +130,19 @@ export default function Dashboard({ searchTerm }) {
           }, 2000);
         }}
       />
-      <Box sx={{ ml: "70px", backgroundColor: "#1E252B", minHeight: "260vh", padding: 2 }}>
+      <Box
+        sx={{
+          ml: "70px",
+          backgroundColor: "#1E252B",
+          minHeight: "260vh",
+          padding: 2,
+        }}
+      >
         <Grid sx={{ justifyContent: "center" }} container spacing={10}>
           <Grid item xs={6}>
-            <Box sx={{ display: "flex", alignItems: "center", marginBottom: 2 }}>
+            <Box
+              sx={{ display: "flex", alignItems: "center", marginBottom: 2 }}
+            >
               <Box
                 sx={{
                   height: 86,
@@ -185,7 +196,11 @@ export default function Dashboard({ searchTerm }) {
               </Box>
             </Box>
 
-            <CreatePostForm open={open} handleClose={handleClose} onCreate={handleCreatePost} />
+            <CreatePostForm
+              open={open}
+              handleClose={handleClose}
+              onCreate={handleCreatePost}
+            />
 
             {feedbackMessage && (
               <Box
@@ -213,7 +228,7 @@ export default function Dashboard({ searchTerm }) {
                   backgroundColor: "#262D34",
                   borderRadius: 4,
                   marginBottom: 2,
-                  position: "relative", // Para posicionar o botão de deletar
+                  position: "relative",
                 }}
               >
                 {role === "ADMIN" && (
@@ -354,5 +369,5 @@ export default function Dashboard({ searchTerm }) {
         </Grid>
       </Box>
     </div>
-  );  
+  );
 }

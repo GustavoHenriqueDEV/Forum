@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable react/prop-types */
 import React from "react";
 import {
   Box,
@@ -13,7 +15,7 @@ import { useLocation } from "react-router-dom";
 
 export default function Sidebar({ setFilter }) {
   const location = useLocation();
-  
+
   if (location.pathname === "/profile") {
     return null;
   }

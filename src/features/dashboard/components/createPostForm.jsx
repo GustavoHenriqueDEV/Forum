@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable react/prop-types */
 // src/components/CreatePostForm.jsx
 import React, { useState } from "react";
 import {
@@ -51,7 +53,7 @@ const CreatePostForm = ({ open, handleClose, onCreate }) => {
     onCreate({
       ...newPost,
       tipo: value?.title || newPost.tipo,
-      imagembase64: base64Image,
+      imagem: base64Image,
     });
     // Resetar o formulário
     setNewPost({ titulo: "", tipo: "", conteudo: "" });
@@ -95,9 +97,7 @@ const CreatePostForm = ({ open, handleClose, onCreate }) => {
           fullWidth
           variant="outlined"
           value={newPost.titulo}
-          onChange={(e) =>
-            setNewPost({ ...newPost, titulo: e.target.value })
-          }
+          onChange={(e) => setNewPost({ ...newPost, titulo: e.target.value })}
         />
         <TextField
           margin="dense"
@@ -119,9 +119,7 @@ const CreatePostForm = ({ open, handleClose, onCreate }) => {
             },
           }}
           value={newPost.conteudo}
-          onChange={(e) =>
-            setNewPost({ ...newPost, conteudo: e.target.value })
-          }
+          onChange={(e) => setNewPost({ ...newPost, conteudo: e.target.value })}
           variant="outlined"
         />
         <Button
