@@ -1,3 +1,4 @@
+// src/pages/Dashboard/Dashboard.jsx
 import React, { useState } from "react";
 import {
   Box,
@@ -11,13 +12,14 @@ import {
   Badge,
   Fab,
 } from "@mui/material";
+import CircularProgress from "@mui/material/CircularProgress";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../../../components/sideBar/sideBar";
 import CreatePostForm from "../../dashboard/components/createPostForm";
 import { usePosts } from "../../dashboard/hooks/usePosts";
 
-export default function Dashboard({ searchTerm }) { 
+export default function Dashboard({ searchTerm }) {
   const [filterType, setFilterType] = useState("all");
   const [isLoadingFilter, setIsLoadingFilter] = useState(false);
   const [open, setOpen] = useState(false);
@@ -37,7 +39,7 @@ export default function Dashboard({ searchTerm }) {
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
-    console.log("handleClose chamado"); 
+    console.log("handleClose chamado"); // Log para depuração
     setOpen(false);
   };
 
@@ -94,13 +96,23 @@ export default function Dashboard({ searchTerm }) {
         sx={{
           marginTop: "70px",
           display: "flex",
+          flexDirection: "column",
           justifyContent: "center",
           alignItems: "center",
           minHeight: "calc(100vh - 70px)",
           backgroundColor: "#1E252B",
         }}
       >
-        <Typography sx={{ color: "#fff" }}>Carregando...</Typography>
+        <CircularProgress
+          size={60}
+          thickness={4}
+          sx={{
+            color: "#FF6934", // Cor personalizada
+          }}
+        />
+        <Typography sx={{ color: "#fff", marginTop: 2, fontSize: "1.2rem" }}>
+          Carregando...
+        </Typography>
       </Box>
     );
   }
@@ -116,7 +128,7 @@ export default function Dashboard({ searchTerm }) {
           }, 2000);
         }}
       />
-      <Box sx={{ ml:"70px", backgroundColor: "#1E252B", minHeight: "260vh", padding: 2 }}>
+      <Box sx={{ ml: "70px", backgroundColor: "#1E252B", minHeight: "260vh", padding: 2 }}>
         <Grid sx={{ justifyContent: "center" }} container spacing={10}>
           <Grid item xs={6}>
             <Box sx={{ display: "flex", alignItems: "center", marginBottom: 2 }}>
@@ -201,7 +213,7 @@ export default function Dashboard({ searchTerm }) {
                   backgroundColor: "#262D34",
                   borderRadius: 4,
                   marginBottom: 2,
-                  position: "relative", 
+                  position: "relative", // Para posicionar o botão de deletar
                 }}
               >
                 {role === "ADMIN" && (
