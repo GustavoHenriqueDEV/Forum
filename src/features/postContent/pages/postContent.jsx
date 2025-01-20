@@ -1,58 +1,41 @@
-// src/pages/Post/PostContent.jsx
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom"; 
-import { getComentariosByPost, createComentario, getPostById} from "../../postContent/api/postService";
-import { getRespostasByComentario, createResposta} from "../../postContent/api/responseService";
-import {
-  Box,
-  Typography,
-  Button,
-  TextField,
-  CircularProgress,
-  Paper,
-  IconButton,
-  Collapse,
-} from "@mui/material";
-import CommentIcon from "@mui/icons-material/Comment";
+import { useParams, useNavigate } from "react-router-dom";
+import { getPostById } from "../../postContent/api/postService";
+import { Box, Typography, Button, IconButton } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import AvatarWithInitials from "../../../utils/AvatarWithInitials";
 import Sidebar from "../../../components/sideBar/sideBar";
+import CommentsSection from "../components/CommentsSection";
 import { useAuth } from "../../../../AuthProvider";
+import { useComments } from "../hooks/useComments";
 
 export default function PostContent() {
   const { idpost } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
   const [post, setPost] = useState(null);
-  const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [newComment, setNewComment] = useState("");
-  const [openComments, setOpenComments] = useState(false);
-  const [respostasPorComentario, setRespostasPorComentario] = useState({});
+
+  const {
+    comments,
+    respostasPorComentario,
+    newComment,
+    setNewComment,
+    fetchComments,
+    handleCreateComment,
+    handleToggleRespostas,
+    handleChangeNovaResposta,
+    handleCreateResposta,
+  } = useComments(idpost, user);
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       try {
-        setLoading(true);
         const postData = await getPostById(idpost);
         setPost(postData);
-
-        const commentsData = await getComentariosByPost(idpost);
-        setComments(commentsData);
-
-        const inicial = {};
-        commentsData.forEach((comment) => {
-          inicial[comment.idcomentario] = {
-            respostas: [],
-            aberto: false,
-            novaResposta: "",
-          };
-        });
-        setRespostasPorComentario(inicial);
+        await fetchComments();
       } catch (error) {
-        console.error("Erro ao carregar os dados:", error);
-        setError("Não foi possível carregar os dados do post e comentários.");
+        console.error("Erro ao carregar o post:", error);
       } finally {
         setLoading(false);
       }
@@ -61,114 +44,34 @@ export default function PostContent() {
     fetchData();
   }, [idpost]);
 
-  const handleToggleComments = () => {
-    setOpenComments(!openComments);
-  };
-
-  const handleCreateComment = async () => {
-    if (!user) {
-      alert("Usuário não autenticado!");
-      return;
-    }
-
-    try {
-      const comentario = {
-        conteudo: newComment,
-        usuario: { idusuario: user.idusuario },
-      };
-
-      await createComentario(idpost, comentario);
-
-      const updatedComments = await getComentariosByPost(idpost);
-      setComments(updatedComments);
-
-      const inicial = {};
-      updatedComments.forEach((comment) => {
-        inicial[comment.idcomentario] = {
-          respostas: [],
-          aberto: false,
-          novaResposta: "",
-        };
-      });
-      setRespostasPorComentario(inicial);
-
-      setNewComment("");
-    } catch (error) {
-      console.error("Erro ao criar comentário:", error);
-      alert("Erro ao publicar comentário.");
-    }
-  };
-
-  const handleToggleRespostas = async (idcomentario) => {
-    const jaAberto = respostasPorComentario[idcomentario]?.aberto;
-
-    if (!jaAberto) {
-      try {
-        const respostas = await getRespostasByComentario(idcomentario);
-        setRespostasPorComentario((prev) => ({
-          ...prev,
-          [idcomentario]: {
-            ...prev[idcomentario],
-            respostas: respostas,
-            aberto: true,
-          },
-        }));
-      } catch (error) {
-        console.error("Erro ao buscar respostas:", error);
-      }
-    } else {
-      setRespostasPorComentario((prev) => ({
-        ...prev,
-        [idcomentario]: {
-          ...prev[idcomentario],
-          aberto: false,
-        },
-      }));
-    }
-  };
-
-  const handleChangeNovaResposta = (idcomentario, valor) => {
-    setRespostasPorComentario((prev) => ({
-      ...prev,
-      [idcomentario]: {
-        ...prev[idcomentario],
-        novaResposta: valor,
-      },
-    }));
-  };
-
-  const handleCreateResposta = async (idcomentario) => {
-    if (!user) {
-      alert("Usuário não autenticado!");
-      return;
-    }
-    try {
-      const respostaBody = {
-        conteudo: respostasPorComentario[idcomentario].novaResposta,
-        idUsuario: user.idusuario,
-      };
-
-      const createdResposta = await createResposta(idcomentario, respostaBody);
-      setRespostasPorComentario((prev) => ({
-        ...prev,
-        [idcomentario]: {
-          ...prev[idcomentario],
-          respostas: [...prev[idcomentario].respostas, createdResposta],
-          novaResposta: "",
-        },
-      }));
-    } catch (error) {
-      console.error("Erro ao criar resposta:", error);
-      alert("Erro ao publicar resposta.");
-    }
-  };
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          height: "100vh",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "#17202a",
+        }}
+      >
+        <Typography sx={{ color: "#FFF" }}>Carregando...</Typography>
+      </Box>
+    );
+  }
 
   if (!post) {
     return (
-      <Box textAlign="center" p={3} bgcolor="#2A2F38" borderRadius={2}>
-        <Typography style={{ color: "#FFF" }}>
-          Nenhum post encontrado.
-        </Typography>
+      <Box
+        sx={{
+          height: "100vh",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "#17202a",
+        }}
+      >
+        <Typography sx={{ color: "#FFF" }}>Nenhum post encontrado.</Typography>
       </Box>
     );
   }
@@ -178,259 +81,108 @@ export default function PostContent() {
       style={{
         display: "flex",
         paddingTop: "64px",
-        marginTop: "20px",
-        minHeight: "100vh",
-        width: "100%",
         backgroundColor: "#17202a",
+        minHeight: "100vh",
       }}
     >
       <Sidebar />
       <Box
-            p={3}
-            height="100%"
-            width={1000}
-            maxHeight={10000} 
-            mx="auto"
-            ml={70}
-            mt={2}
-            bgcolor="#2A2F38"
-            boxShadow={3}
-            borderRadius={2}
-            color="#FFF"
-            style={{
-              transition: "all 0.3s ease-in-out", // Transição suave ao expandir
-            }}
-          >
-
-        <Typography
+        sx={{
+          flex: 1,
+          padding: "20px",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          color: "#FFF",
+        }}
+      >
+        {/* Botão de Voltar */}
+        <Box
           sx={{
             display: "flex",
             alignItems: "center",
-            marginBottom: 2,
+            width: "100%",
+            maxWidth: "900px",
+            marginBottom: "20px",
           }}
         >
           <IconButton
-            sx={{ mr: "4px", color: "#FFF" }}
             onClick={() => navigate("/")}
+            sx={{
+              color: "#FFF",
+              backgroundColor: "#2A2F38",
+              marginRight: "10px",
+              ":hover": { backgroundColor: "#1E252B" },
+            }}
           >
             <ArrowBackIcon />
           </IconButton>
-          <AvatarWithInitials name={post.usuario.nome || "Usuário"} sx={{ width: "23px", height: "23px", marginRight: 1 }} />
-          {post.usuario.nome || "erro"}
-        </Typography>
+          <Typography variant="h6" sx={{ color: "#FFF" }}>
+            Voltar para Dashboard
+          </Typography>
+        </Box>
 
-        <Typography
-          variant="body1"
-          gutterBottom
-          fontSize={20}
-          style={{ color: "#F2F4F5", textAlign: "justify" }}
-        >
-          {post.titulo || "Conteúdo indisponível"}
-        </Typography>
-
-        <Typography
-          letterSpacing={1}
-          fontSize={14}
-          variant="body1"
-          gutterBottom
-          style={{ color: "#B8C5C9", textAlign: "justify" }}
-        >
-          {post.conteudo || "Conteúdo indisponível"}
-        </Typography>
-
-        {post.imagembase64 && (
-          <Box
-            component="img"
-            src={`data:image/png;base64,${post.imagembase64}`}
-            alt={post.titulo || "Imagem do post"}
-            width="100%"
-            maxHeight={400}
-            borderRadius={2}
-            mb={2}
-            sx={{ objectFit: "cover", border: "2px solid #444" }}
-          />
-        )}
-        <Box sx={{ borderBottom: "3px solid #444" }} />
-
-        <Button
-          variant="contained"
-          style={{
-            backgroundColor: "#00D1B2",
-            color: "#FFF",
-            marginTop: "20px",
-            display: "flex",
-            alignItems: "center",
-            gap: "8px",
+        {/* Conteúdo do Post */}
+        <Box
+          sx={{
+            width: "80%",
+            maxWidth: "900px",
+            backgroundColor: "#2A2F38",
+            padding: "20px",
+            borderRadius: "8px",
+            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
           }}
-          onClick={handleToggleComments}
         >
-          <CommentIcon sx={{ color: "#FFF" }} />
-          {openComments ? "Ocultar Comentários" : "Mostrar Comentários"}
-        </Button>
-
-        <Collapse in={openComments} timeout="auto" unmountOnExit>
-          <Box mt={4} bgcolor="#1E252B" p={3} borderRadius={2}>
-            <Typography variant="h5" style={{ color: "#00D1B2" }} gutterBottom>
-              Comentários
-            </Typography>
-            {comments.length > 0 ? (
-              comments.map((comment) => (
-                <Paper
-                  key={comment.idcomentario}
-                  elevation={2}
-                  style={{
-                    backgroundColor: "#2A2F38",
-                    padding: "15px",
-                    marginBottom: "15px",
-                    borderRadius: "8px",
-                  }}
-                >
-                  <Typography style={{ color: "#FFF", fontWeight: "bold" }}>
-                    {comment.usuario?.nome || "Anônimo"}:
-                  </Typography>
-
-                  <Typography style={{ color: "#D4D4D4", marginBottom: 8 }}>
-                    {comment.conteudo || "Sem conteúdo"}
-                  </Typography>
-
-                  <Button
-                    size="small"
-                    variant="outlined"
-                    sx={{ borderColor: "#00D1B2", color: "#00D1B2", mb: 1 }}
-                    onClick={() => handleToggleRespostas(comment.idcomentario)}
-                  >
-                    {respostasPorComentario[comment.idcomentario]?.aberto
-                      ? "Ocultar Respostas"
-                      : "Ver Respostas"}
-                  </Button>
-                  <Collapse
-                    in={respostasPorComentario[comment.idcomentario]?.aberto}
-                    timeout="auto"
-                    unmountOnExit
-                  >
-                    <Box mt={1} sx={{ pl: 2, borderLeft: "2px solid #444" }}>
-                      {/* Lista de Respostas */}
-                      {respostasPorComentario[comment.idcomentario]?.respostas
-                        ?.length > 0 ? (
-                        respostasPorComentario[
-                          comment.idcomentario
-                        ].respostas.map((resposta) => (
-                          <Paper
-                            key={resposta.id}
-                            elevation={1}
-                            sx={{
-                              p: 1,
-                              my: 1,
-                              backgroundColor: "#1E252B",
-                              borderRadius: 1,
-                            }}
-                          >
-                            <Typography
-                              style={{ color: "#FFF", fontWeight: "bold" }}
-                              variant="body2"
-                            >
-                              {resposta.usuario?.nome || "Anônimo"}:
-                            </Typography>
-                            <Typography
-                              style={{ color: "#D4D4D4" }}
-                              variant="body2"
-                            >
-                              {resposta.conteudo}
-                            </Typography>
-                          </Paper>
-                        ))
-                      ) : (
-                        <Typography
-                          variant="body2"
-                          style={{
-                            color: "#D4D4D4",
-                            fontStyle: "italic",
-                            marginTop: 8,
-                          }}
-                        >
-                          Não há respostas ainda.
-                        </Typography>
-                      )}
-
-                      {user && (
-                        <Box mt={2} display="flex" gap={2}>
-                          <TextField
-                            fullWidth
-                            variant="outlined"
-                            placeholder="Escreva uma resposta..."
-                            value={
-                              respostasPorComentario[comment.idcomentario]
-                                ?.novaResposta || ""
-                            }
-                            onChange={(e) =>
-                              handleChangeNovaResposta(
-                                comment.idcomentario,
-                                e.target.value
-                              )
-                            }
-                            style={{
-                              backgroundColor: "#2A2F38",
-                              color: "#FFF",
-                              borderRadius: "8px",
-                            }}
-                            InputProps={{
-                              style: { color: "#FFF" },
-                            }}
-                          />
-                          <Button
-                            variant="contained"
-                            style={{
-                              backgroundColor: "#00D1B2",
-                              color: "#FFF",
-                            }}
-                            onClick={() =>
-                              handleCreateResposta(comment.idcomentario)
-                            }
-                          >
-                            Responder
-                          </Button>
-                        </Box>
-                      )}
-                    </Box>
-                  </Collapse>
-                </Paper>
-              ))
-            ) : (
-              <Typography style={{ color: "#D4D4D4", fontStyle: "italic" }}>
-                Nenhum comentário ainda.
-              </Typography>
-            )}
-            {user && (
-              <Box mt={2} display="flex" gap={2}>
-                <TextField
-                  fullWidth
-                  variant="outlined"
-                  placeholder="Escreva um comentário..."
-                  value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
-                  style={{
-                    backgroundColor: "#2A2F38",
-                    color: "#FFF",
-                    borderRadius: "8px",
-                  }}
-                  InputProps={{
-                    style: { color: "#FFF" },
-                  }}
-                />
-                <Button
-                  variant="contained"
-                  style={{
-                    backgroundColor: "#00D1B2",
-                    color: "#FFF",
-                  }}
-                  onClick={handleCreateComment}
-                >
-                  Publicar
-                </Button>
-              </Box>
-            )}
-          </Box>
-        </Collapse>
+          <Typography
+            variant="h4"
+            gutterBottom
+            sx={{
+              fontWeight: "bold",
+              marginBottom: "10px",
+              color: "#00D1B2",
+            }}
+          >
+            {post.titulo}
+          </Typography>
+          <Typography
+            variant="body1"
+            sx={{
+              marginBottom: "20px",
+              color: "#B8C5C9",
+              lineHeight: 1.8,
+              textAlign: "justify",
+            }}
+          >
+            {post.conteudo}
+          </Typography>
+          {post.imagembase64 && (
+            <Box
+              component="img"
+              src={`data:image/png;base64,${post.imagembase64}`}
+              alt="Imagem do Post"
+              sx={{
+                width: "100%",
+                maxHeight: "400px",
+                objectFit: "cover",
+                borderRadius: "8px",
+                marginBottom: "20px",
+                border: "2px solid #444",
+              }}
+            />
+          )}
+          <Box sx={{ borderBottom: "2px solid #444", marginBottom: "20px" }} />
+          <CommentsSection
+            comments={comments}
+            user={user}
+            respostasPorComentario={respostasPorComentario}
+            handleToggleRespostas={handleToggleRespostas}
+            handleChangeNovaResposta={handleChangeNovaResposta}
+            handleCreateResposta={handleCreateResposta}
+            handleCreateComment={handleCreateComment}
+            newComment={newComment}
+            setNewComment={setNewComment}
+          />
+        </Box>
       </Box>
     </div>
   );
