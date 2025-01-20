@@ -28,10 +28,7 @@ export const usePosts = () => {
     isError,
     error,
     refetch,
-  } = useQuery({
-    queryKey: ["posts"],
-    queryFn: fetchPosts,
-  });
+  } = useQuery({ queryKey: ["posts"], queryFn: fetchPosts });
 
   const createPostMutation = useMutation({
     mutationFn: createPostApi,
@@ -64,17 +61,23 @@ export const usePosts = () => {
     mutationFn: ({ idpost, idusuario }) => incrementLikes(idpost, idusuario),
     onSuccess: (updatedLikes, variables) => {
       const { idpost } = variables;
+      console.log(`Likes atualizados para o post ${idpost}: ${updatedLikes}`);
       queryClient.setQueryData(["posts"], (old) =>
         old.map((post) =>
           post.idpost === idpost ? { ...post, likes: updatedLikes } : post
         )
+      );
+      // Invalidando query para dar certo
+      queryClient.invalidateQueries(["posts"]);
+      console.log(
+        "Dados no cache após dar like:",
+        queryClient.getQueryData(["posts"])
       );
     },
     onError: (error) => {
       console.error("Erro ao dar like:", error);
     },
   });
-
   return {
     posts,
     isLoading,

@@ -27,8 +27,10 @@ export const getPostById = async (id) => {
   }
 };
 
+// src/dashboard/api/postsCrd.js
 export const createPostApi = async (post) => {
   try {
+    console.log("Dados enviados para criação de post:", post); // Log para depuração
     const token = localStorage.getItem("token");
     const response = await axios.post(`${API_URL}/posts`, post, {
       headers: {
@@ -36,7 +38,7 @@ export const createPostApi = async (post) => {
         Authorization: `Bearer ${token}`,
       },
     });
-    return response.data;
+    return response.data; // Certifique-se de que o backend retorna o post criado com todos os campos necessários
   } catch (error) {
     console.error("Erro ao criar post:", error);
     throw error;
@@ -75,6 +77,9 @@ export const deletePost = async (id) => {
 
 export const incrementLikes = async (idpost, idusuario) => {
   try {
+    console.log(
+      `Enviando like para o post ${idpost} pelo usuário ${idusuario}`
+    );
     const token = localStorage.getItem("token");
     const response = await axios.post(
       `${API_URL}/posts/${idpost}/likes?idusuario=${idusuario}`,
@@ -86,7 +91,8 @@ export const incrementLikes = async (idpost, idusuario) => {
         },
       }
     );
-    return response.data.likes;
+    console.log("Resposta do servidor após dar like:", response.data);
+    return response.data.likes; // Certifique-se de que o backend retorna o número atualizado de likes
   } catch (error) {
     console.error("Erro no serviço de likes:", error);
     throw error;

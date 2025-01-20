@@ -152,6 +152,9 @@ export default function Dashboard({ searchTerm }) {
       return;
     }
     try {
+      console.log(
+        `Dando like no post ${idpost} pelo usuário ${idusuarioLocal}`
+      );
       await likePost({ idpost, idusuario: parseInt(idusuarioLocal, 10) });
     } catch (error) {
       alert(error.message);
