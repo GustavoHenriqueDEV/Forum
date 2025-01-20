@@ -191,7 +191,7 @@ export default function Dashboard() { // Removido 'searchTerm' das props
                   position: "relative", // Para posicionar o botão de deletar
                 }}
               >
-                {role === "admin" && (
+                {role === "ADMIN" && (
                   <Button
                     onClick={(e) => {
                       e.stopPropagation();

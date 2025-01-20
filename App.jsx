@@ -5,8 +5,8 @@ import Dashboard from "./src/features/dashboard/pages/dashBoard";
 import { AppBar } from "@mui/material";
 import CustomAppBar from "./src/components/appBar/pages/appBar";
 import PostContent from "./src/features/postContent/pages/postContent";
+import ProfilePage from "./src/features/profille/pages/profile";
 //import PostContent from "./pages/Post/PostContent";
-//import ProfilePage from "./pages/Profile/ProfilePage";
 //import { ThemeProvider } from "@mui/material/styles";
 //import theme from "./theme";
 function App() {
@@ -21,6 +21,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Dashboard  />} />
             <Route path="/post/:idpost" element={<PostContent />} />
+            <Route path="/profile" element={<ProfilePage />} />
           </Routes>
         </Router>
     </AuthProvider>
