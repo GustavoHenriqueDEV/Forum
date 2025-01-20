@@ -16,15 +16,15 @@ function App() {
   };
   return (
     <AuthProvider>
-        <Router>
-         <CustomAppBar onSearch={handleSearch} />
-          <Routes>
-            <Route path="/" element={<Dashboard  />} />
-            <Route path="/post/:idpost" element={<PostContent />} />
-            <Route path="/profile" element={<ProfilePage />} />
-          </Routes>
-        </Router>
-    </AuthProvider>
+    <Router>
+      <CustomAppBar onSearch={handleSearch} />
+      <Routes>
+        <Route path="/" element={<Dashboard searchTerm={searchTerm} />} />
+        <Route path="/post/:idpost" element={<PostContent />} />
+        <Route path="/profile" element={<ProfilePage />} />
+      </Routes>
+    </Router>
+  </AuthProvider>
   );
 }
 

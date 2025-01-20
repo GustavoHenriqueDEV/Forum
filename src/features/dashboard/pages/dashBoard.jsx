@@ -1,4 +1,3 @@
-// src/pages/Dashboard/Dashboard.jsx
 import React, { useState } from "react";
 import {
   Box,
@@ -15,9 +14,10 @@ import {
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../../../components/sideBar/sideBar";
-import CreatePostForm from "../../dashboard/components/createPostForm"; import { usePosts } from "../../dashboard/hooks/usePosts";
+import CreatePostForm from "../../dashboard/components/createPostForm";
+import { usePosts } from "../../dashboard/hooks/usePosts";
 
-export default function Dashboard() { // Removido 'searchTerm' das props
+export default function Dashboard({ searchTerm }) { 
   const [filterType, setFilterType] = useState("all");
   const [isLoadingFilter, setIsLoadingFilter] = useState(false);
   const [open, setOpen] = useState(false);
@@ -37,7 +37,7 @@ export default function Dashboard() { // Removido 'searchTerm' das props
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
-    console.log("handleClose chamado"); // Log para depuração
+    console.log("handleClose chamado"); 
     setOpen(false);
   };
 
@@ -45,10 +45,23 @@ export default function Dashboard() { // Removido 'searchTerm' das props
     navigate(`/post/${idpost}`);
   };
 
+  console.log("searchTerm recebido no Dashboard:", searchTerm);
+
   const filteredPosts = posts
     .filter((post) => {
       if (filterType === "popular") {
         return post.likes >= 10;
+      }
+      return true;
+    })
+    .filter((post) => {
+      if (searchTerm) {
+        const lowercasedTerm = searchTerm.toLowerCase();
+        const matches =
+          post.titulo.toLowerCase().includes(lowercasedTerm) ||
+          post.nome.toLowerCase().includes(lowercasedTerm);
+        console.log(`Post: ${post.titulo}, Matches: ${matches}`);
+        return matches;
       }
       return true;
     });
@@ -188,7 +201,7 @@ export default function Dashboard() { // Removido 'searchTerm' das props
                   backgroundColor: "#262D34",
                   borderRadius: 4,
                   marginBottom: 2,
-                  position: "relative", // Para posicionar o botão de deletar
+                  position: "relative", 
                 }}
               >
                 {role === "ADMIN" && (
@@ -329,5 +342,5 @@ export default function Dashboard() { // Removido 'searchTerm' das props
         </Grid>
       </Box>
     </div>
-  );
+  );  
 }
