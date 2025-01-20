@@ -24,7 +24,7 @@ import React, {
   import SearchIcon from "@mui/icons-material/Search";
   import AuthPage from "../../auth/components/authPage";
   import { getInitials } from "../../../utils/helpers";
-  import { useAuth } from "../../../app/hooks/AuthProvider";
+  import { useAuth } from "../../../../AuthProvider";
   import AvatarWithInitials from "../../../utils/AvatarWithInitials";
   
   const CustomAppBar = forwardRef(({ onSearch }, ref) => {

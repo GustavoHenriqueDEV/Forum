@@ -1,5 +1,5 @@
 import { useState, useEffect, createContext, useContext } from "react";
-import { getUserById } from "../app/service";
+import { getUserById } from "./src/app/api/authService";
 
 const AuthContext = createContext();
 
@@ -42,7 +42,6 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-// Hook para usar o contexto de autenticação
 export const useAuth = () => {
   return useContext(AuthContext);
 };

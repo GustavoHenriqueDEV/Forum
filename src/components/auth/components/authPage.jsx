@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { loginUser, registerUser } from "../api/authService";
-import { useAuth } from "../hooks/useAuth";
+import { useAuth } from "../../../../AuthProvider";
 import {
   TextField,
   Button,
