@@ -103,7 +103,7 @@ export default function Dashboard() { // Removido 'searchTerm' das props
           }, 2000);
         }}
       />
-      <Box sx={{ backgroundColor: "#1E252B", minHeight: "100vh", padding: 2 }}>
+      <Box sx={{ ml:"70px", backgroundColor: "#1E252B", minHeight: "260vh", padding: 2 }}>
         <Grid sx={{ justifyContent: "center" }} container spacing={10}>
           <Grid item xs={6}>
             <Box sx={{ display: "flex", alignItems: "center", marginBottom: 2 }}>

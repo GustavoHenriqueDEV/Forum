@@ -26,7 +26,7 @@ export const getPostById = async (id) => {
   }
 };
 
-export const createPost = async (post) => {
+export const createPostApi = async (post) => {
   try {
     const token = localStorage.getItem("token");
     const response = await axios.post(`${API_URL}/posts`, post, {

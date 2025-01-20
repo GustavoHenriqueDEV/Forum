@@ -51,7 +51,7 @@ const CreatePostForm = ({ open, handleClose, onCreate }) => {
     onCreate({
       ...newPost,
       tipo: value?.title || newPost.tipo,
-      imagem: base64Image,
+      imagembase64: base64Image,
     });
     // Resetar o formulário
     setNewPost({ titulo: "", tipo: "", conteudo: "" });

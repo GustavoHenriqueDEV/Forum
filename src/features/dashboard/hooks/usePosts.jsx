@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getPosts, createPost, deletePost, incrementLikes } from "../../dashboard/api/postsCrd";
+import { getPosts, createPostApi, deletePost, incrementLikes } from "../../dashboard/api/postsCrd";
 
 export const usePosts = () => {
   const [posts, setPosts] = useState([]);
@@ -33,7 +33,7 @@ export const usePosts = () => {
       throw new Error("Usuário não autenticado!");
     }
     try {
-      const createdPost = await createPost({
+      const createdPost = await createPostApi({
         ...newPostData,
         usuario: { idusuario: parseInt(idusuarioLocal) },
       });
