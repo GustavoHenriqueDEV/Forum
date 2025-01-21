@@ -18,6 +18,7 @@ import { useNavigate } from "react-router-dom";
 import Sidebar from "../../../components/sideBar/sideBar";
 import CreatePostForm from "../../dashboard/components/createPostForm";
 import { usePosts } from "../../dashboard/hooks/usePosts";
+import RightSideBar from "../../../components/Sidebar/RightSideBar";
 
 export default function Dashboard({ searchTerm }) {
   const [filterType, setFilterType] = useState("all");
@@ -172,6 +173,8 @@ export default function Dashboard({ searchTerm }) {
           }, 2000);
         }}
       />
+      <RightSideBar />
+
       <Box
         sx={{
           ml: "70px",
