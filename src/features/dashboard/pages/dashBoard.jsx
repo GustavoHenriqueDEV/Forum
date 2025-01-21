@@ -100,19 +100,17 @@ export default function Dashboard({ searchTerm }) {
 
   const filteredPosts = posts
     ?.filter((post) => {
-      if (filterType === "popular") {
-        return post.likes >= 10;
-      }
-      return true;
+      if (filterType === "all") return true;
+      if (filterType === "popular") return post.likes >= 10; // Filtro "Popular"
+      return post.tipo === filterType; // Filtro por tipo
     })
     .filter((post) => {
       if (searchTerm) {
         const lowercasedTerm = searchTerm.toLowerCase();
-        const matches =
+        return (
           post.titulo.toLowerCase().includes(lowercasedTerm) ||
-          post.nome.toLowerCase().includes(lowercasedTerm);
-        console.log(`Post: ${post.titulo}, Matches: ${matches}`);
-        return matches;
+          post.nome.toLowerCase().includes(lowercasedTerm)
+        );
       }
       return true;
     });

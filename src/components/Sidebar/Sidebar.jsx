@@ -1,17 +1,20 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable react/prop-types */
 import React from "react";
-import {
-  Box,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemIcon,
-  Divider,
-} from "@mui/material";
-import TrendingUpIcon from "@mui/icons-material/TrendingUp";
-import BarChartIcon from "@mui/icons-material/BarChart";
+import { Box, List, ListItem, ListItemText, Divider } from "@mui/material";
 import { useLocation } from "react-router-dom";
+
+const options = [
+  { title: "all" },
+
+  { title: "Notícias" },
+  { title: "Artigos" },
+  { title: "Tutoriais" },
+  { title: "Opinião" },
+  { title: "Revisão/Review" },
+  { title: "Análise" },
+  { title: "Lista/Ranking" },
+  { title: "Guia rápido" },
+  { title: "Dicas" },
+];
 
 export default function Sidebar({ setFilter }) {
   const location = useLocation();
@@ -34,42 +37,26 @@ export default function Sidebar({ setFilter }) {
         display: "flex",
         flexDirection: "column",
         padding: "20px",
+        overflowY: "auto",
       }}
     >
       <List>
-        <ListItem
-          button
-          onClick={() => setFilter("popular")}
-          sx={{
-            transition: "transform 0.3s, background-color 0.3s",
-            "&:hover": {
-              transform: "scale(1.05)",
-              backgroundColor: "#333",
-            },
-          }}
-        >
-          <ListItemIcon sx={{ color: "#d7dadc" }}>
-            <TrendingUpIcon />
-          </ListItemIcon>
-          <ListItemText primary="Popular" />
-        </ListItem>
-        <Divider sx={{ marginY: "20px", borderColor: "#2a2a2c" }} />
-        <ListItem
-          button
-          onClick={() => setFilter("all")}
-          sx={{
-            transition: "transform 0.3s, background-color 0.3s",
-            "&:hover": {
-              transform: "scale(1.05)",
-              backgroundColor: "#333",
-            },
-          }}
-        >
-          <ListItemIcon sx={{ color: "#d7dadc" }}>
-            <BarChartIcon />
-          </ListItemIcon>
-          <ListItemText primary="Tudo" />
-        </ListItem>
+        {options.map((option) => (
+          <ListItem
+            button
+            key={option.title}
+            onClick={() => setFilter(option.title)}
+            sx={{
+              transition: "transform 0.3s, background-color 0.3s",
+              "&:hover": {
+                transform: "scale(1.05)",
+                backgroundColor: "#333",
+              },
+            }}
+          >
+            <ListItemText primary={option.title} />
+          </ListItem>
+        ))}
       </List>
       <Divider sx={{ marginY: "20px", borderColor: "#2a2a2c" }} />
     </Box>
