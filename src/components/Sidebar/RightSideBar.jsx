@@ -15,6 +15,8 @@ import { useMostViwedPosts } from "../Sidebar/hooks/useMostViewedPosts";
 export default function RightSideBar({ setFilter, onPostClick }) {
   const { posts } = useMostViwedPosts();
 
+  const sortedPosts = [...posts].sort((a, b) => b.likes - a.likes);
+
   return (
     <Box
       sx={{
@@ -37,7 +39,7 @@ export default function RightSideBar({ setFilter, onPostClick }) {
       </Typography>
       <Divider sx={{ mb: 2, borderColor: "#3e4142" }} />
       <List>
-        {posts.map((post) => (
+        {sortedPosts.map((post) => (
           <ListItem
             key={post.idpost}
             sx={{
