@@ -1,10 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  
-  deletePost,
-  updatePost,
-} from "../../profille/api/modifyPost";
+import { deletePost, updatePost } from "../../profille/api/modifyPost";
 import { updateUser, getUserById, getPostsByUser } from "../api/modifyUser";
 import {
   Button,
@@ -138,7 +134,7 @@ export default function ProfilePage() {
       }}
     >
       <IconButton
-        sx={{ ml: "10px", color: "#FFF" }}
+        sx={{ mt: "20px", ml: "10px", color: "#FFF" }}
         onClick={() => navigate("/")}
       >
         <ArrowBackIcon />
@@ -308,12 +304,16 @@ export default function ProfilePage() {
                     >
                       Salvar
                     </Button>
-                    <Button onClick={() => setEditingPost(null)}>Cancelar</Button>
+                    <Button onClick={() => setEditingPost(null)}>
+                      Cancelar
+                    </Button>
                   </>
                 ) : (
                   <>
                     <Typography variant="h6">{post.titulo}</Typography>
-                    <Typography sx={{ marginBottom: 1 }}>{post.conteudo}</Typography>
+                    <Typography sx={{ marginBottom: 1 }}>
+                      {post.conteudo}
+                    </Typography>
                     <Button
                       onClick={() => setEditingPost(post.idpost)}
                       variant="outlined"

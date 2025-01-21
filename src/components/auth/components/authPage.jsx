@@ -189,7 +189,9 @@ export default function AuthPage({ onClose }) {
             variant="body2"
             sx={{ color: "#FF6F00" }}
           >
-            {isLogin ? "Não tem uma conta? Registrar" : "Já tem uma conta? Login"}
+            {isLogin
+              ? "Não tem uma conta? Registrar"
+              : "Já tem uma conta? Login"}
           </Link>
         </Box>
       </Box>
