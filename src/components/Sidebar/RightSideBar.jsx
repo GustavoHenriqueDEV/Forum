@@ -11,11 +11,17 @@ import {
   Avatar,
 } from "@mui/material";
 import { useMostViwedPosts } from "../Sidebar/hooks/useMostViewedPosts";
+import { useNavigate } from "react-router-dom";
 
 export default function RightSideBar({ setFilter, onPostClick }) {
   const { posts } = useMostViwedPosts();
 
   const sortedPosts = [...posts].sort((a, b) => b.likes - a.likes);
+
+  const handlePostClick = (idpost) => {
+    navigate(`/post/${idpost}`);
+  };
+  const navigate = useNavigate();
 
   return (
     <Box
@@ -48,6 +54,7 @@ export default function RightSideBar({ setFilter, onPostClick }) {
             }}
           >
             <Card
+              onClick={() => handlePostClick(post.idpost)}
               sx={{
                 width: "100%",
                 backgroundColor: "#2a2f38",
