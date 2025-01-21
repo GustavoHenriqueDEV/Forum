@@ -272,6 +272,11 @@ export default function Dashboard({ searchTerm }) {
                   marginBottom: 2,
                   position: "relative",
                   cursor: "pointer",
+                  transition: "transform 0.3s, box-shadow 0.3s",
+                  "&:hover": {
+                    transform: "scale(1.03)",
+                    boxShadow: 6,
+                  },
                 }}
               >
                 {role === "ADMIN" && (
@@ -302,25 +307,6 @@ export default function Dashboard({ searchTerm }) {
                         sx={{ width: "23px", height: "23px", marginRight: 1 }}
                       />
                       {post.nome} •
-                      <Typography
-                        sx={{
-                          color: "#8ba2ad",
-                          mt: "2px",
-                          ml: "3px",
-                          fontSize: "11px",
-                        }}
-                      >
-                        {post.data_criacao
-                          ? new Date(post.data_criacao).toLocaleDateString(
-                              "pt-BR",
-                              {
-                                day: "2-digit",
-                                month: "2-digit",
-                                year: "numeric",
-                              }
-                            )
-                          : "Data inválida"}
-                      </Typography>
                     </Typography>
                     <Typography
                       sx={{
@@ -356,7 +342,7 @@ export default function Dashboard({ searchTerm }) {
                       }}
                     >
                       <img
-                        src={`data:image/png;base64,${post.imagem}`}
+                        src={`data:image/png;base64,${post.imagembase64}`}
                         alt="Ilustração do Post"
                         style={{
                           maxWidth: "100%",

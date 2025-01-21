@@ -79,6 +79,7 @@ export default function PostContent() {
   return (
     <div
       style={{
+        marginLeft: "250px",
         display: "flex",
         paddingTop: "64px",
         backgroundColor: "#17202a",
@@ -109,6 +110,8 @@ export default function PostContent() {
           <IconButton
             onClick={() => navigate("/")}
             sx={{
+              mr: "10px",
+              mt: "30px",
               color: "#FFF",
               backgroundColor: "#2A2F38",
               marginRight: "10px",
@@ -117,8 +120,11 @@ export default function PostContent() {
           >
             <ArrowBackIcon />
           </IconButton>
-          <Typography variant="h6" sx={{ color: "#FFF" }}>
-            Voltar para Dashboard
+          <Typography
+            variant="h6"
+            sx={{ mr: "10px", mt: "30px", color: "#FFF" }}
+          >
+            Dashboard
           </Typography>
         </Box>
 

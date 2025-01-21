@@ -141,7 +141,6 @@ export default function ProfilePage() {
         Home
       </IconButton>
       <Grid container sx={{ height: "100%", padding: 2 }} spacing={2}>
-        {/* Seção de Edição do Usuário */}
         <Grid item xs={12} md={6}>
           <Box
             sx={{
