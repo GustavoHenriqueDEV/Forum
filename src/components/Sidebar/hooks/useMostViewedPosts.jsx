@@ -5,7 +5,6 @@ export const useMostViwedPosts = () => {
   const fetchPosts = async () => {
     const postsData = await getPosts();
 
-    // Ordena os posts por curtidas (likes) em ordem decrescente
     return postsData
       .map((p) => ({
         ...p,
@@ -13,7 +12,7 @@ export const useMostViwedPosts = () => {
           ? new Date(p.data_criacao).toISOString()
           : null,
       }))
-      .sort((a, b) => b.likes - a.likes); // Ordenação decrescente
+      .sort((a, b) => b.likes - a.likes);
   };
 
   const {
